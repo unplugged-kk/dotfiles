@@ -136,16 +136,15 @@ in
       tfd = "terraform destroy";
       tfi = "terraform init";
 
-      # apply dotfiles changes
-      #   rebuild         - fast: apply current dotfiles (no version bumps)
-      #   rebuild --upgrade - full upgrade: nix flake update + package upgrade + switch
-      #   rebuild --dry-run  - preview the --upgrade plan without changes
-      # Mac uses darwin-rebuild (full nix-darwin + home-manager + nix-homebrew).
-      # Linux uses standalone home-manager (no nix-darwin on non-NixOS distros).
-      rebuild = if isLinux then
-        "home-manager switch --flake ~/.dotfiles#${user}"
-      else
-        "sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ~/.dotfiles#mac";
+      # apply dotfiles changes - rebuild.sh handles arg parsing (--upgrade,
+      # --dry-run, --help) and platform detection (Mac: darwin-rebuild;
+      # Linux: home-manager). Forwarding through rebuild.sh (rather than
+      # aliasing straight to darwin-rebuild) keeps the --upgrade flow working
+      # because rebuild.sh eats those args before calling darwin-rebuild.
+      #   rebuild             - fast: apply current dotfiles (no version bumps)
+      #   rebuild --upgrade   - full upgrade: nix flake update + pkg upgrade + switch
+      #   rebuild --dry-run   - preview the --upgrade plan without changes
+      rebuild = "~/.dotfiles/rebuild.sh";
       # short alias for the full upgrade flow (runs ./rebuild.sh --upgrade)
       reup = "~/.dotfiles/rebuild.sh --upgrade";
 
