@@ -22,3 +22,6 @@ home/.config/herdr/release-notes.json
 # (re-cloned on every herdr plugin update; never commit the clone or its
 # target/release/ binary).
 home/.config/herdr/plugins/github/
+
+# herdr plugin registry (rewritten by `herdr plugin install/uninstall`)
+home/.config/herdr/plugins.json
