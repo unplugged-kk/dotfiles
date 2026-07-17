@@ -59,6 +59,15 @@ else
 fi
 
 echo "==> Step 5: first darwin-rebuild switch (pinned to nix-darwin-26.05)"
+
+# Tap-trust warnings ("Cannot check whether X is outdated because its tap
+# is not trusted") are suppressed at the source via HOMEBREW_NO_AUTO_UPDATE
+# in configuration.nix environment.sessionVariables. Disabling `brew update`
+# during brew bundle eliminates both the auto-update hint and the tap-trust
+# warnings. Note: `brew trust --formula` does NOT actually mark the tap as
+# trusted - the trust flag is tap-level and only set by brew for official
+# taps or via attestations. If a future rebuild needs to re-enable update
+# checks for these taps, use HOMEBREW_AUTO_UPDATE_SECS or HOMEBREW_NO_ENV_HINTS.
 NIX_BIN="$(command -v nix)"
 sudo "$NIX_BIN" run github:nix-darwin/nix-darwin/nix-darwin-26.05#darwin-rebuild -- \
   switch --flake ~/.dotfiles#mac

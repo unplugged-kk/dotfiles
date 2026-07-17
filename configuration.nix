@@ -31,6 +31,23 @@
     "${homeDir}/.nvm/versions/node/v22.12.0/bin"
   ];
 
+  # ── Session environment variables (system-wide, propagated to sudo) ───────
+  # Set here (not in home.sessionVariables) because nix-darwin runs brew
+  # bundle as root during rebuild - the env var needs to be visible to that
+  # sudo invocation. home.sessionVariables only applies to interactive user
+  # shells, so the var wouldn't reach brew bundle otherwise.
+  environment.sessionVariables = {
+    # Skip `brew update` auto-run during nix-darwin rebuild. nix-homebrew
+    # already manages formula versions declaratively, so brew bundle can
+    # install from cached index info. Suppresses the
+    # HOMEBREW_AUTO_UPDATE_SECS / NO_AUTO_UPDATE hint on every rebuild AND
+    # the tap-trust warnings ("Cannot check whether X is outdated because
+    # its tap is not trusted") which only appear during `brew update`.
+    # To keep auto-update enabled but silence the hint only, change to:
+    #   HOMEBREW_NO_ENV_HINTS = "1";
+    HOMEBREW_NO_AUTO_UPDATE = "1";
+  };
+
   # ── macOS defaults ────────────────────────────────────────────────────────
   system.defaults = {
     NSGlobalDomain = {
@@ -82,6 +99,8 @@
       "supabase/tap"        # supabase
       "avirajkhare00/yoyo"  # yoyo
       "devops-rob/tap"      # target
+      "coder/coder"         # coder (remote dev environments)
+      "getkimchi/tap"       # kimchi CLI
     ];
 
     brews = [
@@ -102,9 +121,26 @@
       # backend
       "supabase/tap/supabase"
 
+      # containers
+      "container"        # apple container cli
+      "docker"           # docker engine
+      "docker-compose"   # docker compose plugin
+
+      # python runtimes - parallel versions managed by brew. the python.org
+      # python 3.13 lives in /Applications/Python 3.13 and stays manual.
+      "python@3.11"
+      "python@3.12"
+      "python@3.13"
+      "python@3.14"
+
+      # terminal file manager
+      "yazi"
+
       # other tools already installed
       "avirajkhare00/yoyo/yoyo"
       "devops-rob/tap/target"
+      "coder/coder/coder"
+      "getkimchi/tap/kimchi"
 
       # github cli - declared here (not in home.nix) because brew's internal
       # subprocesses (used by some formula installs, e.g. tools that fetch
@@ -125,10 +161,14 @@
       # editors / IDEs
       "cursor"
       "visual-studio-code"
+      "sublime-text"
+      "antigravity"
 
       # ai agents
       "claude-code"
       "copilot-cli"
+      "ollama-app"
+      "osaurus"
 
       # kubernetes
       "lens"
@@ -138,15 +178,19 @@
 
       # api testing
       "bruno"
+      "postman"
 
       # communication
       "discord"
 
-      # utilities
+      # networking / utilities
+      "tailscale-app"
       "localsend"
 
       # NOTE: brave-browser is installed via DMG - macOS SIP prevents brew
       # from taking ownership of it. Manage it manually outside this config.
+      # NOTE: python.org's Python 3.13 lives in /Applications/Python 3.13
+      # and is managed by the python.org installer (not brew).
     ];
   };
 }

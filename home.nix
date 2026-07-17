@@ -17,6 +17,7 @@ in
     fd          # fast find
     fzf         # fuzzy finder
     zoxide      # smarter cd - learns your most-used dirs
+    direnv      # per-directory env vars (.envrc auto-load on cd)
 
     # json / yaml
     jq          # json processor
