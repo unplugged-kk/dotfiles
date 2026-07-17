@@ -122,6 +122,23 @@ else
   echo "    treehouse $("$HOME/.local/bin/treehouse" --version 2>&1) installed"
 fi
 
+echo "==> Step 7.5: herdr plugin â herdr-file-viewer (smarzban/herdr-file-viewer)"
+# Git-aware, read-only file viewer that lives in a herdr pane: tree on the
+# left, diffs / rendered markdown / syntax-highlighted code on the right.
+# Installed via herdr's plugin manager, which clones the repo and fetches
+# the prebuilt aarch64-apple-darwin binary (or falls back to cargo build).
+# Keybindings (prefix+shift+f for split, prefix+shift+t for own tab) live in
+# ~/.dotfiles/home/.config/herdr/config.toml (symlinked by home.nix).
+# Plugin runtime state and cache (plugins.json, plugins/github/) are
+# gitignored in this repo so we don't commit herdr's internal registry.
+if herdr plugin list 2>/dev/null | grep -q "herdr-file-viewer"; then
+  echo "    herdr-file-viewer already installed, skipping"
+else
+  echo "    installing herdr-file-viewer..."
+  herdr plugin install smarzban/herdr-file-viewer --yes
+  echo "    herdr-file-viewer installed"
+fi
+
 echo "==> Step 8: gh-axi + gnhf (npm globals)"
 set +u
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
