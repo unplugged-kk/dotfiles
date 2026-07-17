@@ -3,6 +3,30 @@ set -euo pipefail
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 ln -sfn "$DIR" ~/.dotfiles
 
+# ── Platform detection: drives which activate/build/pkg-upgrade command runs ──
+PLATFORM="$(uname -s)"
+REAL_USER="$(whoami)"
+case "$PLATFORM" in
+  Darwin)
+    # macOS: full nix-darwin + home-manager + nix-homebrew bundle
+    activate()      { sudo /run/current-system/sw/bin/darwin-rebuild switch --flake "$DIR#mac"; }
+    activate_dry()  { sudo /run/current-system/sw/bin/darwin-rebuild build  --flake "$DIR#mac" || true; }
+    pkg_upgrade()   { brew upgrade --greedy || true; }
+    ;;
+  Linux)
+    # Linux: standalone home-manager, no nix-darwin equivalent (would need NixOS).
+    # homeConfigurations."${user}" in flake.nix (set by bootstrap.sh) holds the
+    # /home/<user> homeDir for this logged-in account. Same home.nix on both.
+    activate()      { home-manager switch --flake "$DIR#${REAL_USER}"; }
+    activate_dry()  { home-manager build  --flake "$DIR#${REAL_USER}" || true; }
+    pkg_upgrade()   { sudo apt-get update && sudo apt-get upgrade -y || true; }
+    ;;
+  *)
+    echo "Unsupported platform: $PLATFORM" >&2
+    exit 1
+    ;;
+esac
+
 usage() {
   cat <<EOF
 Usage: ./rebuild.sh [--upgrade | --dry-run]
@@ -46,7 +70,7 @@ for arg in "$@"; do
 done
 
 if [ "$UPGRADE" = false ]; then
-  exec sudo /run/current-system/sw/bin/darwin-rebuild switch --flake "$DIR#mac"
+  exec activate
 fi
 
 # ── Upgrade flow ────────────────────────────────────────────────────────────
@@ -84,7 +108,7 @@ echo ""
 
 if [ "$DRY_RUN" = true ]; then
   echo "==> 3/5: DRY-RUN - showing build plan, NOT activating"
-  sudo /run/current-system/sw/bin/darwin-rebuild build --flake "$DIR#mac" || true
+  activate_dry
   echo ""
   echo "==> 4/5: DRY-RUN - skipping brew upgrade"
   echo "==> 5/5: DRY-RUN - skipping nix profile upgrade"
@@ -93,18 +117,12 @@ if [ "$DRY_RUN" = true ]; then
   exit 0
 fi
 
-echo "==> 3/5: darwin-rebuild switch (apply upgraded system)"
-sudo /run/current-system/sw/bin/darwin-rebuild switch --flake "$DIR#mac"
+echo "==> 3/5: $( [[ "$PLATFORM" = Linux ]] && echo home-manager || echo darwin-rebuild ) switch (apply upgraded system)"
+activate
 echo ""
 
-echo "==> 4/5: brew upgrade (latest brew packages)"
-if command -v brew >/dev/null 2>&1; then
-  # --greedy also upgrades casks marked auto_updates true (cursor, discord, etc.)
-  brew upgrade --greedy || true
-  echo "    Run \`brew cleanup\` to reclaim disk space from old bottles."
-else
-  echo "    brew not on PATH - skipping"
-fi
+echo "==> 4/5: $( [[ "$PLATFORM" = Linux ]] && echo 'apt upgrade' || echo 'brew upgrade' ) (latest system packages)"
+pkg_upgrade
 echo ""
 
 echo "==> 5/5: nix profile upgrade (user-profile packages)"

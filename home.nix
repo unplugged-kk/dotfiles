@@ -1,4 +1,4 @@
-{ config, pkgs, user, homeDir, ... }:
+{ config, pkgs, user, homeDir, isLinux ? false, ... }:
 
 let
   dotfiles = "${homeDir}/.dotfiles";
@@ -68,18 +68,26 @@ in
   };
 
   # ── PATH additions ────────────────────────────────────────────────────────
-  # /opt/homebrew/bin holds brew/cask binaries (gh, copilot, etc.). ~/.local/bin
-  # holds binaries installed outside nix/brew (no-mistakes, treehouse, headroom,
-  # codegraph, code-review-graph, claude symlink, opencode symlink). ~/.opencode/bin
-  # holds the opencode CLI. ~/.nvm/versions/node/<v>/bin holds node + npm + npx +
-  # global npm packages (commandcode). Also mirrored in configuration.nix:18
-  # environment.systemPath for non-interactive shells.
-  home.sessionPath = [
-    "/opt/homebrew/bin"
-    "$HOME/.local/bin"
-    "$HOME/.opencode/bin"
-    "$HOME/.nvm/versions/node/v22.12.0/bin"
-  ];
+  # Mac: /opt/homebrew/bin holds brew/cask binaries. ~/.local/bin holds
+  # user-installed binaries (no-mistakes, treehouse, etc.). ~/.opencode/bin
+  # holds the opencode CLI. ~/.nvm/versions/node/<v>/bin holds node + npm.
+  # Mirrored in configuration.nix:24 environment.systemPath for non-interactive
+  # shells on macOS.
+  #
+  # Linux: drop /opt/homebrew/bin (doesn't exist on Linux). Add
+  # ~/.nix-profile/bin so nix user-profile packages are on PATH.
+  home.sessionPath =
+    if isLinux then [
+      "$HOME/.nix-profile/bin"
+      "$HOME/.local/bin"
+      "$HOME/.opencode/bin"
+      "$HOME/.nvm/versions/node/v22.12.0/bin"
+    ] else [
+      "/opt/homebrew/bin"
+      "$HOME/.local/bin"
+      "$HOME/.opencode/bin"
+      "$HOME/.nvm/versions/node/v22.12.0/bin"
+    ];
 
   # ── Shell ─────────────────────────────────────────────────────────────────
   programs.zsh = {
@@ -130,9 +138,14 @@ in
 
       # apply dotfiles changes
       #   rebuild         - fast: apply current dotfiles (no version bumps)
-      #   rebuild --upgrade - full upgrade: nix flake update + brew upgrade + switch
+      #   rebuild --upgrade - full upgrade: nix flake update + package upgrade + switch
       #   rebuild --dry-run  - preview the --upgrade plan without changes
-      rebuild = "sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ~/.dotfiles#mac";
+      # Mac uses darwin-rebuild (full nix-darwin + home-manager + nix-homebrew).
+      # Linux uses standalone home-manager (no nix-darwin on non-NixOS distros).
+      rebuild = if isLinux then
+        "home-manager switch --flake ~/.dotfiles#${user}"
+      else
+        "sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ~/.dotfiles#mac";
       # short alias for the full upgrade flow (runs ./rebuild.sh --upgrade)
       reup = "~/.dotfiles/rebuild.sh --upgrade";
 

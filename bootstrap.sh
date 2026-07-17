@@ -5,6 +5,14 @@ set -euo pipefail
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 
+# ── Platform detection: drives steps 2, 4, 5 below ─────────────────────────
+PLATFORM="$(uname -s)"
+case "$PLATFORM" in
+  Darwin) PLATFORM_LABEL="macOS" ;;
+  Linux)  PLATFORM_LABEL="Linux (Ubuntu/Debian assumed)" ;;
+  *) echo "Unsupported platform: $PLATFORM"; exit 1 ;;
+esac
+
 # ── Guard: fail early if placeholder values haven't been replaced ─────────
 if grep -q '"yourname"' "$DIR/flake.nix" 2>/dev/null; then
   echo "ERROR: flake.nix still contains placeholder user = \"yourname\"."
@@ -24,12 +32,33 @@ else
   set -u
 fi
 
-echo "==> Step 2: Homebrew"
-if command -v brew >/dev/null 2>&1; then
-  echo "    brew already installed, skipping"
-else
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-fi
+echo "==> Step 2: ${PLATFORM_LABEL} system packages + package manager"
+case "$PLATFORM" in
+  Darwin)
+    if command -v brew >/dev/null 2>&1; then
+      echo "    brew already installed, skipping"
+    else
+      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    fi
+    ;;
+  Linux)
+    # apt packages: basics for the bootstrap itself, plus fonts that GUI apps
+    # expect system-wide, plus docker from Ubuntu's repo. apt-get (not apt) for
+    # stable scripting output. sudo apt-get update first so the install doesn't
+    # hit a stale cache.
+    sudo apt-get update
+    sudo apt-get install -y \
+      git build-essential ca-certificates curl wget xz-utils unzip zip \
+      fonts-noto-color-emoji fonts-noto-cjk fonts-hack-ttf fonts-jetbrains-mono \
+      iproute2 dnsutils docker.io docker-compose-v2
+    # docker group membership so `docker` works without sudo. The new group
+    # only takes effect on next login, or `newgrp docker` in the current shell.
+    if ! groups "$(whoami)" | grep -q "\bdocker\b"; then
+      sudo usermod -aG docker "$(whoami)"
+      echo "    Added $(whoami) to the docker group. Log out and back in (or run 'newgrp docker') before using docker without sudo."
+    fi
+    ;;
+esac
 
 echo "==> Step 3: symlink this repo to ~/.dotfiles"
 ln -sfn "$DIR" ~/.dotfiles
@@ -58,19 +87,58 @@ else
   echo "    flake.nix already matches \"$REAL_USER\", nothing to do."
 fi
 
-echo "==> Step 5: first darwin-rebuild switch (pinned to nix-darwin-26.05)"
+# Linux only: rewrite homeDirLinux in flake.nix to match actual $HOME
+# (typically /home/<user>). Step 5 below uses this for
+# `home-manager switch --flake $DIR#${REAL_USER}`. Mac keeps homeDir only.
+if [ "$PLATFORM" = Linux ]; then
+  REAL_HOME="$HOME"
+  CURRENT_LINUX_HOME="$(sed -nE 's/^[[:space:]]*homeDirLinux = "([^"]+)";.*/\1/p' "$DIR/flake.nix" | head -n1)"
+  if [ -z "$CURRENT_LINUX_HOME" ]; then
+    echo "    Could not find the single \"homeDirLinux = \" line in flake.nix."
+    echo "    Edit flake.nix yourself before continuing."
+    exit 1
+  elif [ "$CURRENT_LINUX_HOME" != "$REAL_HOME" ]; then
+    echo "    flake.nix homeDirLinux is \"$CURRENT_LINUX_HOME\", but \$HOME is \"$REAL_HOME\"."
+    read -r -p "    Rewrite flake.nix's \"homeDirLinux = \" line to \"$REAL_HOME\"? [y/N] " REPLY
+    if [ "$REPLY" = "y" ] || [ "$REPLY" = "Y" ]; then
+      sed -i '' -E "s/^([[:space:]]*homeDirLinux = \")[^\"]+(\";.*)/\1${REAL_HOME}\2/" "$DIR/flake.nix"
+      echo "    Updated. Review with: git diff flake.nix"
+    else
+      echo "    Kept as \"$CURRENT_LINUX_HOME\". Make sure this matches the actual Linux home directory."
+    fi
+  else
+    echo "    flake.nix homeDirLinux already matches \"$REAL_HOME\", nothing to do."
+  fi
+fi
 
-# Tap-trust warnings ("Cannot check whether X is outdated because its tap
-# is not trusted") are suppressed at the source via HOMEBREW_NO_AUTO_UPDATE
-# in configuration.nix environment.sessionVariables. Disabling `brew update`
-# during brew bundle eliminates both the auto-update hint and the tap-trust
-# warnings. Note: `brew trust --formula` does NOT actually mark the tap as
-# trusted - the trust flag is tap-level and only set by brew for official
-# taps or via attestations. If a future rebuild needs to re-enable update
-# checks for these taps, use HOMEBREW_AUTO_UPDATE_SECS or HOMEBREW_NO_ENV_HINTS.
-NIX_BIN="$(command -v nix)"
-sudo "$NIX_BIN" run github:nix-darwin/nix-darwin/nix-darwin-26.05#darwin-rebuild -- \
-  switch --flake ~/.dotfiles#mac
+case "$PLATFORM" in
+  Darwin)
+    echo "==> Step 5: first darwin-rebuild switch (pinned to nix-darwin-26.05)"
+
+    # Tap-trust warnings ("Cannot check whether X is outdated because its tap
+    # is not trusted") are suppressed at the source via HOMEBREW_NO_AUTO_UPDATE
+    # in configuration.nix environment.sessionVariables. Disabling `brew update`
+    # during brew bundle eliminates both the auto-update hint and the tap-trust
+    # warnings. Note: `brew trust --formula` does NOT actually mark the tap as
+    # trusted - the trust flag is tap-level and only set by brew for official
+    # taps or via attestations. If a future rebuild needs to re-enable update
+    # checks for these taps, use HOMEBREW_AUTO_UPDATE_SECS or HOMEBREW_NO_ENV_HINTS.
+    NIX_BIN="$(command -v nix)"
+    sudo "$NIX_BIN" run github:nix-darwin/nix-darwin/nix-darwin-26.05#darwin-rebuild -- \
+      switch --flake ~/.dotfiles#mac
+    ;;
+  Linux)
+    echo "==> Step 5: first home-manager switch (standalone, no nix-darwin on Linux)"
+
+    # No nix-darwin equivalent on non-NixOS distros. Activate home-manager
+    # directly via the homeConfigurations."${user}" output from flake.nix.
+    # homeDirLinux (set just above) tells home.nix where the user's $HOME is
+    # (/home/<user> on Ubuntu/Debian). Same home.nix works for both platforms;
+    # isLinux = true makes it drop /opt/homebrew/bin from sessionPath and add
+    # ~/.nix-profile/bin instead.
+    nix run home-manager -- switch --flake "$DIR#${REAL_USER}"
+    ;;
+esac
 
 echo "==> Step 6: nvm + Node.js LTS"
 export NVM_DIR="$HOME/.nvm"

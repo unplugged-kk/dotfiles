@@ -212,6 +212,101 @@ ls ~/git/personal/firstmate/AGENTS.md
 
 ---
 
+## Linux (Ubuntu/Debian) setup
+
+The same dotfiles work on Linux with one architecture difference: there is no
+`nix-darwin` for non-NixOS distros, so step 5 of bootstrap activates
+`home-manager` standalone instead of `darwin-rebuild`. Everything else (steps 6-15,
+all `home.nix` packages, all agent tools) is shared with macOS. `bootstrap.sh` and
+`rebuild.sh` auto-detect the platform with `uname -s` and branch accordingly.
+
+### Prerequisites
+- Ubuntu 22.04+ or Debian 12+ (apt-based; tested on Ubuntu 24.04 LTS)
+- sudo access (used to apt-install system packages and run home-manager)
+- Internet access
+- x86_64 or aarch64 CPU. Default `flake.nix` uses `x86_64-linux`; edit the
+  `homeConfigurations."${user}"` output to `aarch64-linux` on ARM (Apple silicon
+  under Asahi Linux, Raspberry Pi, etc.) if needed
+
+### What works on Linux (unchanged from macOS)
+- All `home.packages` in `home.nix`: ripgrep, fd, fzf, zoxide, direnv, jq,
+  yq-go, lazygit, git-lfs, delta, bat, eza, tree, htop, fastfetch, zip,
+  unzip, kubectl, k9s, neovim, bun, nerd-fonts + noto-fonts
+- All cross-platform brew formulae (now Nix packages): herdr, terraform,
+  vault, boundary, azure-cli, kubelogin, flux, helm, supabase, yoyo,
+  target, coder, kimchi, gh, yazi, python@3.11-3.14 - sourced from
+  `pkgs.<name>` in nixpkgs; tap-only formulae (coder, kimchi) install
+  via direct GitHub release download in bootstrap
+- All agent tools (no-mistakes, treehouse, gh-axi, gnhf, firstmate,
+  headroom, code-review-graph, herdr-file-viewer)
+- All `home.file.*` symlinks under `home/.config/*` and agent rules
+- zsh + autosuggestions + syntax highlighting, starship prompt,
+  git + delta config, lazygit
+
+### What is skipped on Linux
+- **All 18 Mac casks** (wezterm, ghostty, warp, cursor, vscode, sublime,
+  antigravity, claude-code, copilot-cli, ollama, osaurus, lens,
+  obsidian, bruno, postman, discord, tailscale, localsend). These are
+  macOS apps. Install Linux equivalents manually if needed.
+- **`container` brew formula** - Apple-only CLI (Linux has Docker
+  instead, installed via apt below).
+- **`docker` / `docker-compose` brew formulae** - replaced by
+  `apt install docker.io docker-compose-v2` in step 2 of bootstrap.
+- **`nix-homebrew` module + all brew taps/brews** - no brew on Linux.
+
+### First-time setup
+
+```bash
+git clone https://github.com/unplugged-kk/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+
+# Optional: back up files that will become symlinks (under home-manager)
+cp ~/.claude/CLAUDE.md ~/.claude/CLAUDE.md.manual-backup 2>/dev/null || true
+cp ~/.claude/settings.json ~/.claude/settings.json.manual-backup 2>/dev/null || true
+cp ~/.config/opencode/opencode.jsonc ~/.config/opencode/opencode.jsonc.manual-backup 2>/dev/null || true
+
+chmod +x bootstrap.sh rebuild.sh
+./bootstrap.sh
+```
+
+What `bootstrap.sh` does on Linux (auto-detected, no flag needed):
+
+| Step | Action |
+|------|--------|
+| 1 | Install Determinate Nix (if missing) |
+| 2 | `apt install` system packages + docker: git, build-essential, ca-certificates, curl, wget, xz-utils, unzip, zip, fonts (noto-color-emoji, noto-cjk, hack, jetbrains-mono), iproute2, dnsutils, docker.io, docker-compose-v2. Adds user to `docker` group. |
+| 3 | Symlink repo to `~/.dotfiles` |
+| 4 | Detect `$(whoami)` and `$HOME`, offer to rewrite `flake.nix`'s `user` and `homeDirLinux` to match |
+| 5 | `home-manager switch --flake ~/.dotfiles#<username>` (standalone, no nix-darwin) |
+| 6-15 | Same as macOS: nvm + Node.js LTS, no-mistakes + treehouse, herdr-file-viewer, gh-axi + gnhf, firstmate, agent skills, code-review-graph |
+
+### After bootstrap
+- Log out and back in (so the `docker` group membership takes effect), or run `newgrp docker` in the current shell.
+- Open a new terminal; `which docker` should resolve without sudo.
+- Run `rebuild` to verify the `rebuild` alias works - on Linux it expands to
+  `home-manager switch --flake ~/.dotfiles#<user>`.
+
+### Daily workflow on Linux
+
+```bash
+rebuild              # home-manager switch --flake ~/.dotfiles#<user>
+rebuild --upgrade    # nix flake update + home-manager build/switch + apt upgrade
+rebuild --dry-run    # preview the --upgrade plan without changes
+```
+
+### Differences vs macOS
+- `rebuild` does not call `darwin-rebuild` - it calls `home-manager switch` directly.
+- `--upgrade` does `apt-get update && apt-get upgrade -y` instead of `brew upgrade --greedy`.
+- No `nix-homebrew` integration - brew taps/casks/formulae do not apply. Cross-platform formulae become Nix packages; Mac casks are skipped entirely.
+- No macOS defaults applied (Dock auto-hide, dark mode, key repeat, etc.) - those are `system.defaults.*` from nix-darwin which has no Linux equivalent.
+
+### Troubleshooting
+
+- **`/home/<user>` not found in flake.nix?** `bootstrap.sh` writes `homeDirLinux` to match your `$HOME`. Re-run `./bootstrap.sh` and answer `y` when prompted.
+- **`docker: permission denied`** even after install? You need to log out and back in (or `newgrp docker`) for the docker group membership to take effect in your shell.
+- **No fonts in terminal?** The bootstrap installs `fonts-hack-ttf`, `fonts-jetbrains-mono`, and `fonts-noto-color-emoji` system-wide. Set your terminal's font to "Hack" or "JetBrainsMono Nerd Font" for icon support.
+- **`nix: command not found`** after install? Open a new shell or `. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh`. The Determinate installer usually sets this up automatically; check `~/.bashrc` / `~/.zshrc` for the source line.
+
 ## Daily workflow
 
 ### Applying config changes
