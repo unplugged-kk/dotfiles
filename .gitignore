@@ -10,3 +10,15 @@ result-*
 *.swo
 .idea/
 .vscode/
+
+# herdr runtime state (logs, sockets, session cache)
+home/.config/herdr/*.log
+home/.config/herdr/*.sock
+home/.config/herdr/session.json
+home/.config/herdr/release-notes.json
+
+# herdr plugin cache - managed by `herdr plugin install`, NOT dotfiles.
+# Version-hashed dir names like github/herdr-file-viewer-c993314e2614/
+# (re-cloned on every herdr plugin update; never commit the clone or its
+# target/release/ binary).
+home/.config/herdr/plugins/github/
