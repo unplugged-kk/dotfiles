@@ -1,0 +1,76 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  // ── Model ──────────────────────────────────────────────────────────────────
+  "model": "claude-sonnet-4-5",
+
+  // ── MCP servers ────────────────────────────────────────────────────────────
+  // All commands use absolute paths because MCP child processes may spawn before
+  // home-manager session PATH is loaded. See home.nix:69 home.sessionPath.
+  "mcp": {
+    // Code intelligence - per-project (run `codegraph init` in a project to enable)
+    "codegraph": {
+      "type": "local",
+      "command": ["/Users/kishore/.local/bin/codegraph", "serve", "--mcp"],
+      "enabled": true
+    },
+
+    // Token compression - 20-95% fewer tokens, same answers
+    "headroom": {
+      "type": "local",
+      "command": ["/Users/kishore/.local/bin/headroom", "mcp", "serve"],
+      "enabled": true
+    },
+
+    // Code review graph - PR-level structural review (https://github.com/tirth8205/code-review-graph)
+    // Installed via pipx in bootstrap.sh step 15; binary lands in ~/.local/bin
+    "code-review-graph": {
+      "type": "local",
+      "command": ["/Users/kishore/.local/bin/code-review-graph", "serve"],
+      "enabled": true
+    },
+
+    // Cross-session memory - persists knowledge across agent sessions
+    // Use absolute path to nvm node - MCP child processes don't inherit nvm PATH
+    "claude-mem": {
+      "type": "local",
+      "command": ["/Users/kishore/.nvm/versions/node/v22.12.0/bin/node", "/Users/kishore/.claude/plugins/marketplaces/thedotmack/plugin/scripts/mcp-server.cjs"],
+      "enabled": true
+    },
+
+    // Atlassian Rovo MCP - hosted Remote MCP with native OAuth 2.1
+    // See: https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/
+    // First-use flow: opencode will prompt for OAuth via browser automatically on 401
+    "atlassian": {
+      "type": "remote",
+      "url": "https://mcp.atlassian.com/v1/mcp/authv2",
+      "enabled": true
+    },
+
+    // Obsidian vault access (requires Obsidian Local REST API plugin running)
+    // API key stored in ~/.claude/settings.local.json - do NOT commit
+    "obsidian": {
+      "type": "local",
+      "command": ["npx", "-y", "mcp-obsidian"],
+      "enabled": false,
+      "_note": "Set OBSIDIAN_API_KEY and OBSIDIAN_HOST env vars in settings.local.json before enabling"
+    }
+  },
+
+  // ── Plugins ────────────────────────────────────────────────────────────────
+  // ponytail: lazy senior dev mode - YAGNI, minimal code, no over-engineering
+  "plugin": [
+    "/Users/kishore/.nvm/versions/node/v22.12.0/lib/node_modules/@dietrichgebert/ponytail/.opencode/plugins/ponytail.mjs"
+  ],
+
+  // ── Permissions (singular "permission" - per-tool allow/ask/deny) ─────────
+  // OpenCode allows everything by default. We only restrict destructive bash.
+  // MCP tools are auto-allowed when their server is enabled (no entry needed).
+  "permission": {
+    "edit": "allow",
+    "bash": "allow",
+    "webfetch": "allow",
+    "rm -rf *": "deny",
+    "sudo *": "ask"
+  }
+}

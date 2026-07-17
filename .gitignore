@@ -1,0 +1,12 @@
+# macOS metadata
+.DS_Store
+
+# Nix build artifacts (in case anyone runs nix build in the repo root)
+result
+result-*
+
+# Editor / IDE scratch
+*.swp
+*.swo
+.idea/
+.vscode/

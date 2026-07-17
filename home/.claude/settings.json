@@ -1,0 +1,132 @@
+{
+  "env": {
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-8",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5",
+    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "32000",
+    "MAX_THINKING_TOKENS": "16000",
+    "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+    "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "1",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "ENABLE_PROMPT_CACHING_1H": "1",
+    "CLAUDE_ENABLE_STREAM_WATCHDOG": "1",
+    "CLAUDE_ENABLE_BYTE_WATCHDOG": "1",
+    "CLAUDE_STREAM_IDLE_TIMEOUT_MS": "600000"
+  },
+  "permissions": {
+    "allow": [
+      "mcp__codegraph__codegraph_explore",
+      "mcp__codegraph__codegraph_search",
+      "mcp__codegraph__codegraph_node",
+      "mcp__codegraph__codegraph_callers",
+      "mcp__codegraph__codegraph_callees",
+      "mcp__codegraph__codegraph_impact",
+      "mcp__codegraph__codegraph_files",
+      "mcp__codegraph__codegraph_status",
+      "mcp__codegraph__*",
+      "mcp__headroom__*",
+      "mcp__code-review-graph__*",
+      "mcp__claude-mem__*",
+      "mcp__atlassian__*"
+    ],
+    "defaultMode": "acceptEdits"
+  },
+  "model": "claude-sonnet-5",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "code-review-graph update",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "gh-axi",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true,
+    "claude-mem@thedotmack": true,
+    "warp@claude-code-warp": true,
+    "caveman@caveman": true,
+    "claude-code-setup@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "thedotmack": {
+      "source": {
+        "source": "github",
+        "repo": "thedotmack/claude-mem"
+      }
+    },
+    "claude-code-warp": {
+      "source": {
+        "source": "github",
+        "repo": "warpdotdev/claude-code-warp"
+      }
+    },
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
+      }
+    }
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "input=$(cat); model=$(echo \"$input\" | jq -r '.model.display_name'); used=$(echo \"$input\" | jq -r '.context_window.used_percentage // empty'); if [ -n \"$used\" ]; then printf \"%s | ctx: %.0f%% used\" \"$model\" \"$used\"; else printf \"%s\" \"$model\"; fi"
+  },
+  "alwaysThinkingEnabled": true,
+  "effortLevel": "medium",
+  "theme": "dark-ansi",
+  "mcpServers": {
+    "codegraph": {
+      "command": "/Users/kishore/.local/bin/codegraph",
+      "args": [
+        "serve",
+        "--mcp"
+      ]
+    },
+    "headroom": {
+      "command": "/Users/kishore/.local/bin/headroom",
+      "args": [
+        "mcp",
+        "serve"
+      ]
+    },
+    "code-review-graph": {
+      "command": "/Users/kishore/.local/bin/code-review-graph",
+      "args": [
+        "serve"
+      ]
+    },
+    "claude-mem": {
+      "command": "/Users/kishore/.nvm/versions/node/v22.12.0/bin/node",
+      "args": [
+        "/Users/kishore/.claude/plugins/marketplaces/thedotmack/plugin/scripts/mcp-server.cjs"
+      ]
+    },
+    "atlassian": {
+      "type": "http",
+      "url": "https://mcp.atlassian.com/v1/mcp/authv2"
+    }
+  },
+  "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "1",
+  "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+  "ENABLE_PROMPT_CACHING_1H": "1",
+  "_note": "Enterprise API keys go in ~/.claude/settings.local.json (gitignored). Obsidian MCP key also goes there.",
+  "tui": "fullscreen"
+}

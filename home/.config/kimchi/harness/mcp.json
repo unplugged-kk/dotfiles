@@ -1,0 +1,29 @@
+{
+  "mcpServers": {
+    "codegraph": {
+      "command": "/Users/kishore/.local/bin/codegraph",
+      "args": ["serve", "--mcp"]
+    },
+    "headroom": {
+      "command": "/Users/kishore/.local/bin/headroom",
+      "args": ["mcp", "serve"]
+    },
+    "code-review-graph": {
+      "command": "/Users/kishore/.local/bin/code-review-graph",
+      "args": ["serve"]
+    },
+    "claude-mem": {
+      "command": "/Users/kishore/.nvm/versions/node/v22.12.0/bin/node",
+      "args": ["/Users/kishore/.claude/plugins/marketplaces/thedotmack/plugin/scripts/mcp-server.cjs"]
+    },
+    "atlassian": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.atlassian.com/v1/mcp/authv2"]
+    },
+    "caveman-shrink": {
+      "command": "npx",
+      "args": ["-y", "caveman-shrink"],
+      "env": {}
+    }
+  }
+}

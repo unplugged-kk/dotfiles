@@ -1,0 +1,13 @@
+# treehouse: reusable git worktree pool for parallel agent sessions
+# https://github.com/kunchenguid/treehouse
+
+# Maximum worktrees in the pool per repo.
+# 16 gives enough for running several parallel agents without excess disk use.
+max_trees = 16
+
+# Hooks run in the worktree directory at lifecycle points.
+# post_create: runs after a worktree is provisioned, before it's handed to you.
+# pre_destroy: runs before a worktree is removed.
+# [hooks]
+# post_create = ["./scripts/setup.sh"]
+# pre_destroy = ["./scripts/teardown.sh"]
