@@ -70,7 +70,7 @@ for arg in "$@"; do
 done
 
 if [ "$UPGRADE" = false ]; then
-  exec activate
+  activate
 fi
 
 # ── Upgrade flow ────────────────────────────────────────────────────────────
