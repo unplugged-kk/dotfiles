@@ -36,7 +36,7 @@
   # bundle as root during rebuild - the env var needs to be visible to that
   # sudo invocation. home.sessionVariables only applies to interactive user
   # shells, so the var wouldn't reach brew bundle otherwise.
-  environment.sessionVariables = {
+  environment.variables = {
     # Skip `brew update` auto-run during nix-darwin rebuild. nix-homebrew
     # already manages formula versions declaratively, so brew bundle can
     # install from cached index info. Suppresses the
