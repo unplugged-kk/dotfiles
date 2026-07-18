@@ -254,14 +254,46 @@ else
 fi
 
 # Cursor CLI (https://cursor.com/docs/cli/overview) - install via official
-# installer. Binary lands at ~/.local/bin/agent (also aliased as cursor-agent).
-# After install, the MCP config in home/.cursor/mcp.json (symlinked by home.nix)
-# provides all 5 MCP servers. Run `agent mcp enable <name>` per server.
-if [ -x "$HOME/.local/bin/agent" ]; then
-  echo "    cursor CLI (agent) already installed at $HOME/.local/bin/agent, skipping"
+# installer. Prefer the unambiguous binary name `cursor-agent` (also installs
+# `agent`, which collides with Grok's `~/.local/bin/agent` symlink). MCP config
+# lives in home/.cursor/mcp.json (symlinked by home.nix). After install, enable
+# servers with: cursor-agent mcp enable <name>
+if [ -x "$HOME/.local/bin/cursor-agent" ]; then
+  echo "    cursor CLI already installed: $("$HOME/.local/bin/cursor-agent" --version 2>&1 | head -1)"
 else
+  # Preserve Grok's agent symlink if present; Cursor install may overwrite
+  # ~/.local/bin/agent with its own binary.
+  GROK_AGENT_TARGET=""
+  if [ -L "$HOME/.local/bin/agent" ] && readlink "$HOME/.local/bin/agent" | grep -q '\.grok/'; then
+    GROK_AGENT_TARGET="$(readlink "$HOME/.local/bin/agent")"
+  fi
   curl https://cursor.com/install -fsS | bash
-  echo "    cursor CLI installed: $("$HOME/.local/bin/agent" --version 2>&1 | head -1)"
+  if [ -n "$GROK_AGENT_TARGET" ]; then
+    ln -sfn "$GROK_AGENT_TARGET" "$HOME/.local/bin/agent"
+    echo "    restored Grok agent symlink at ~/.local/bin/agent"
+  fi
+  echo "    cursor CLI installed: $("$HOME/.local/bin/cursor-agent" --version 2>&1 | head -1)"
+fi
+
+# Pi coding agent (https://pi.dev/) - npm global package. Uses ~/.pi/agent for
+# settings, AGENTS.md, skills, sessions. AGENTS.md + settings.json are
+# symlinked from home/.pi/agent/ via home.nix.
+if command -v pi >/dev/null 2>&1; then
+  echo "    pi already installed, skipping (run \`npm i -g --ignore-scripts @earendil-works/pi-coding-agent@latest\` to upgrade)"
+else
+  npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+  echo "    pi $(pi --version 2>&1 | head -1) installed"
+fi
+
+# Grok Build / xAI CLI (https://x.ai/cli) - official installer. Binary lands at
+# ~/.local/bin/grok (and also as `agent` under ~/.grok/bin). Prefer `grok` /
+# shell alias `gx` so it stays distinct from other tools named agent.
+# Config + AGENTS.md are symlinked from home/.grok/ via home.nix.
+if command -v grok >/dev/null 2>&1; then
+  echo "    grok (xAI CLI) already installed: $(grok --version 2>&1 | head -1)"
+else
+  curl -fsSL https://x.ai/cli/install.sh | bash
+  echo "    grok installed: $(grok --version 2>&1 | head -1)"
 fi
 
 echo "==> Step 12: headroom (token compression layer - 20-95% fewer tokens)"
@@ -333,6 +365,9 @@ echo "      gh-axi            $(gh-axi --version 2>/dev/null)"
 echo "      gnhf              $(gnhf --version 2>/dev/null)"
 echo "      headroom          $("$HOME/.local/bin/headroom" --version 2>/dev/null | head -1)"
 echo "      code-review-graph $("$HOME/.local/bin/code-review-graph" --version 2>&1 | head -1)"
+echo "      cursor-agent      $("$HOME/.local/bin/cursor-agent" --version 2>&1 | head -1)"
+echo "      pi                $(pi --version 2>&1 | head -1)"
+echo "      grok              $(grok --version 2>&1 | head -1)"
 echo "      firstmate         $FIRSTMATE_DIR"
 echo ""
 echo "    MCP servers (available in all agents):"
@@ -340,7 +375,6 @@ echo "      codegraph         - code intelligence"
 echo "      headroom          - token compression"
 echo "      code-review-graph - PR structural review"
 echo "      claude-mem        - cross-session memory"
-echo "      atlassian         - Jira, Confluence, Bitbucket (OAuth via remote MCP)"
 echo ""
 echo "    Skills ($(ls "$HOME/.claude/skills/" | wc -l | tr -d ' ') total in ~/.claude/skills/):"
 echo "      mattpocock/skills, addyosmani/agent-skills, ~/.agents/skills (61 skills)"

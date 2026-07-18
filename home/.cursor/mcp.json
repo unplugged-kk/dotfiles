@@ -26,9 +26,6 @@
       "args": [
         "/Users/kishore/.claude/plugins/marketplaces/thedotmack/plugin/scripts/mcp-server.cjs"
       ]
-    },
-    "atlassian": {
-      "url": "https://mcp.atlassian.com/v1/mcp/authv2"
     }
   }
 }

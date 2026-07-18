@@ -1,0 +1,12 @@
+{
+  "theme": "dark",
+  "defaultThinkingLevel": "medium",
+  "enableInstallTelemetry": false,
+  "compaction": {
+    "enabled": true
+  },
+  "skills": [
+    "~/.claude/skills",
+    "~/.agents/skills"
+  ]
+}

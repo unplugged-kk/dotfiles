@@ -54,6 +54,9 @@ WezTerm, Ghostty, Warp, Cursor, VS Code, Claude Code, GitHub Copilot CLI, Lens, 
 | `headroom` | 59k | Token compression layer (20-95% fewer tokens) |
 | `code-review-graph` | 19.5k | PR-level structural review, ~82x token reduction |
 | `@dietrichgebert/ponytail` | 82.6k | Lazy senior dev mode (YAGNI, -54% code) |
+| `cursor-agent` (`ca`) | - | Cursor CLI agent (https://cursor.com/cli) |
+| `pi` | - | Minimal coding agent harness (https://pi.dev/) |
+| `grok` (`gx`) | - | Grok Build / xAI CLI (https://x.ai/cli) |
 
 ### MCP servers (available in all agents)
 | Server | Transport | Purpose |
@@ -62,7 +65,6 @@ WezTerm, Ghostty, Warp, Cursor, VS Code, Claude Code, GitHub Copilot CLI, Lens, 
 | `headroom` | stdio | Token compression - 20-95% savings |
 | `code-review-graph` | stdio | PR-level structural code review (https://github.com/tirth8205/code-review-graph) |
 | `claude-mem` | stdio | Cross-session memory across all agents |
-| `atlassian` | HTTP | Jira, Confluence, Bitbucket integration (Atlassian Rovo remote MCP, OAuth 2.1) |
 | `obsidian` | stdio | Obsidian vault access (disabled by default, needs API key) |
 
 #### Per-agent MCP config locations
@@ -73,33 +75,97 @@ WezTerm, Ghostty, Warp, Cursor, VS Code, Claude Code, GitHub Copilot CLI, Lens, 
 | Claude Code (`cc`) | `home/.claude/settings.json` | `{ "mcpServers": { "name": { "command"\|"type", ... } } }` |
 | Kimchi | `home/.config/kimchi/harness/mcp.json` | `{ "mcpServers": { "name": { "command", "args", "env" } } }` |
 | Command Code (`cmd`) | `home/.commandcode/mcp.json` | `{ "mcpServers": { "name": { "command"\|"url", ... } } }` |
-| Cursor CLI (`agent`/`cursor-agent`) | `home/.cursor/mcp.json` | `{ "mcpServers": { "name": { "command"\|"url", ... } } }` |
+| Cursor CLI (`ca` / `cursor-agent`) | `home/.cursor/mcp.json` | `{ "mcpServers": { "name": { "command"\|"url", ... } } }` |
+| Pi (`pi`) | `home/.pi/agent/settings.json` + `AGENTS.md` | no built-in MCP; skills + extensions instead |
+| Grok Build (`gx` / `grok`) | `home/.grok/config.toml` | `[mcp_servers.<name>]` TOML tables |
 | GitHub Copilot CLI (`copilot`) | `~/.copilot/` (managed by `/mcp` slash command) | stdio servers via `/mcp add`, remote via `/mcp add` with `type=http` |
 
-All declarative CLIs (OpenCode/Claude/Kimchi/Command Code/Cursor) symlink their MCP config to the same 5 server set from dotfiles. Changes to any file take effect on next CLI launch.
+All declarative CLIs (OpenCode/Claude/Kimchi/Command Code/Cursor/Grok) symlink their MCP config to the same 4 server set from dotfiles. Changes to any file take effect on next CLI launch.
 
 #### Cursor CLI setup (one-time)
 
-Cursor CLI (binary: `agent`, alias: `cursor-agent`) ships its own MCP config format and an explicit approval model. After `bootstrap.sh` step 11b installs it:
+Cursor CLI installs as `cursor-agent` (and also as `agent`). Prefer **`cursor-agent`** / shell alias **`ca`** - `agent` collides with Grok's `~/.local/bin/agent` symlink. After `bootstrap.sh` installs it:
 
 ```bash
 # Verify the symlink landed:
 ls -la ~/.cursor/mcp.json   # -> ~/dotfiles/home/.cursor/mcp.json
 
 # Approve each server (config defines them, but Cursor requires explicit enable):
-agent mcp enable codegraph
-agent mcp enable headroom
-agent mcp enable code-review-graph
-agent mcp enable claude-mem
-agent mcp enable atlassian
+cursor-agent mcp enable codegraph
+cursor-agent mcp enable headroom
+cursor-agent mcp enable code-review-graph
+cursor-agent mcp enable claude-mem
 
 # Confirm:
-agent mcp list
-# All five should show "ready" (atlassian will show "requires_authentication"
-# until first OAuth flow completes).
+cursor-agent mcp list
+# All four should show "ready".
+
+# Launch:
+ca
+# or: cursor-agent "refactor the auth module"
 ```
 
 Cursor supports `${workspaceFolder}` interpolation in `command`/`args`/`env`/`url`/`headers`, used by the `codegraph` entry to scope symbol lookups to the current project.
+
+#### Pi setup (one-time)
+
+Pi (https://pi.dev/) is a minimal coding agent harness. Bootstrap installs it with:
+
+```bash
+npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+```
+
+Declarative config from this repo:
+
+| Path | Purpose |
+|------|---------|
+| `~/.pi/agent/AGENTS.md` | shared global agent rules (same file as Claude/Codex/OpenCode) |
+| `~/.pi/agent/settings.json` | theme, compaction, skill search paths (`~/.claude/skills`, `~/.agents/skills`) |
+
+```bash
+# First run - authenticate via subscription or API key
+pi
+# inside pi: /login
+
+# Common usage
+pi "summarize this repo"
+pi -c                  # continue most recent session
+pi -p "one-shot prompt"
+```
+
+Pi has no built-in MCP. Use skills under `~/.agents/skills` / `~/.claude/skills`, or install packages with `pi install npm:...` / `pi install git:...`.
+
+#### Grok Build / xAI CLI setup (one-time)
+
+Grok Build (https://x.ai/cli) is xAI's terminal coding agent. Bootstrap installs it with:
+
+```bash
+curl -fsSL https://x.ai/cli/install.sh | bash
+```
+
+Prefer **`grok`** / shell alias **`gx`**. The installer also exposes `agent` under `~/.grok/bin` (and may claim `~/.local/bin/agent`); keep that for Grok and use `cursor-agent`/`ca` for Cursor CLI.
+
+Declarative config from this repo:
+
+| Path | Purpose |
+|------|---------|
+| `~/.grok/AGENTS.md` | shared global agent rules |
+| `~/.grok/config.toml` | UI, skills paths, marketplace, and the 4 MCP servers |
+
+```bash
+# Auth (browser) or API key
+grok login
+# or: export XAI_API_KEY=xai-...
+
+# Verify discovery (rules, skills, MCP)
+grok inspect
+
+# Launch
+gx
+# or: grok -p "explain this repo"
+```
+
+Upgrade later with `grok update`. Auth stays in `~/.grok/auth.json` (not in git).
 
 #### GitHub Copilot CLI setup (one-time)
 
@@ -112,10 +178,9 @@ Copilot CLI manages MCP servers interactively via the `/mcp` slash command insid
 /mcp                                              # opens MCP server list TUI
                                                    # remove any broken entries (e.g. typos like "code-review-grap")
 /mcp add code-review-graph stdio /Users/kishore/.local/bin/code-review-graph serve
-/mcp add atlassian http https://mcp.atlassian.com/v1/mcp/authv2
 ```
 
-After adding, run `/mcp` again to confirm both show "connected" status. Atlassian will prompt OAuth via browser on first use.
+After adding, run `/mcp` again to confirm servers show "connected" status.
 
 ### Skills (92 total across all agents)
 Skills live in `~/.agents/skills/` (61 cross-agent) + `~/.claude/skills/` (92 total including mattpocock and addyosmani packs). All symlinked to Claude Code, available in OpenCode and Kimchi.
@@ -137,7 +202,7 @@ All five are from [kunchenguid](https://github.com/kunchenguid) and installed by
 - `pushf` uses `--force-with-lease` (safe force push)
 
 ### Agent configs
-`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.config/opencode/AGENTS.md` all point at one file: `home/AGENTS.md`
+`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.config/opencode/AGENTS.md`, `~/.pi/agent/AGENTS.md`, and `~/.grok/AGENTS.md` all point at one file: `home/AGENTS.md`
 
 ---
 
@@ -576,6 +641,9 @@ nvim
 | `cc` | `claude --dangerously-skip-permissions` | agents |
 | `co` | `codex --full-auto` | agents |
 | `oc` | `opencode` | agents |
+| `ca` | `cursor-agent` | agents |
+| `pi` | Pi coding agent (npm global, no alias) | agents |
+| `gx` | `grok` (xAI / Grok Build CLI) | agents |
 | `th` | `treehouse` | agents |
 | `fm` | `cd ~/git/personal/firstmate && claude` | agents |
 
@@ -594,7 +662,12 @@ Files under `home/` are the real files. `home.nix` uses `mkOutOfStoreSymlink` to
 ~/.claude/CLAUDE.md           -> ~/.dotfiles/home/AGENTS.md
 ~/.codex/AGENTS.md            -> ~/.dotfiles/home/AGENTS.md
 ~/.config/opencode/AGENTS.md  -> ~/.dotfiles/home/AGENTS.md
+~/.pi/agent/AGENTS.md         -> ~/.dotfiles/home/AGENTS.md
+~/.grok/AGENTS.md             -> ~/.dotfiles/home/AGENTS.md
 ~/.claude/settings.json       -> ~/.dotfiles/home/.claude/settings.json
+~/.cursor/mcp.json            -> ~/.dotfiles/home/.cursor/mcp.json
+~/.pi/agent/settings.json     -> ~/.dotfiles/home/.pi/agent/settings.json
+~/.grok/config.toml           -> ~/.dotfiles/home/.grok/config.toml
 ```
 
 If home-manager finds a regular file at a symlink target it renames it to `<name>.backup` automatically (`backupFileExtension = "backup"` in `flake.nix`).
@@ -623,6 +696,9 @@ bootstrap.sh        one-time: Nix + Brew + darwin-rebuild + nvm + agent tools
 home/
   AGENTS.md                           shared rules - Claude, Codex, OpenCode
   .claude/settings.json               Claude Code: theme, permissions
+  .cursor/mcp.json                    Cursor CLI MCP servers
+  .pi/agent/settings.json             Pi: theme, skills paths
+  .grok/config.toml                   Grok Build: UI, MCP, skills, marketplace
   .config/
     wezterm/wezterm.lua               rose-pine moon, 120fps, blur
     nvim/                             lazy.nvim, rose-pine moon, oil, snacks, neogit
@@ -633,6 +709,9 @@ home/
 Agent tools (installed to ~/.local/bin and npm globals):
   ~/.local/bin/no-mistakes            AI-gated PR pipeline (Go)
   ~/.local/bin/treehouse              worktree pool manager (Go)
+  ~/.local/bin/cursor-agent           Cursor CLI (shell alias: ca)
+  pi                                  Pi coding agent (npm global)
+  ~/.local/bin/grok                   Grok Build / xAI CLI (shell alias: gx)
   gh-axi                              GitHub CLI for agents (npm global)
   gnhf                                overnight agent runner (npm global)
   ~/git/personal/firstmate/           multi-agent crew distro (git clone)

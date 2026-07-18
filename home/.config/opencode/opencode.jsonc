@@ -38,15 +38,6 @@
       "enabled": true
     },
 
-    // Atlassian Rovo MCP - hosted Remote MCP with native OAuth 2.1
-    // See: https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/
-    // First-use flow: opencode will prompt for OAuth via browser automatically on 401
-    "atlassian": {
-      "type": "remote",
-      "url": "https://mcp.atlassian.com/v1/mcp/authv2",
-      "enabled": true
-    },
-
     // Obsidian vault access (requires Obsidian Local REST API plugin running)
     // API key stored in ~/.claude/settings.local.json - do NOT commit
     "obsidian": {

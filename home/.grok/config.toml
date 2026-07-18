@@ -1,0 +1,49 @@
+# Grok Build (https://x.ai/cli) — global user config
+# Symlinked to ~/.grok/config.toml by home.nix
+# Auth stays in ~/.grok/auth.json (not managed here)
+
+[cli]
+installer = "internal"
+
+[ui]
+max_thoughts_width = 120
+fork_secondary_model = "grok-build"
+yolo = false
+compact_mode = false
+# Match high-agency agent shortcuts (cc, ca): auto-approve tool use
+permission_mode = "always-approve"
+
+[skills]
+# ~/.claude/skills and ~/.grok/skills are auto-discovered; also scan shared pack
+paths = ["~/.agents/skills"]
+
+[marketplace]
+official_marketplace_auto_installed = true
+
+[[marketplace.sources]]
+name = "xAI Official"
+git = "https://github.com/xai-org/plugin-marketplace.git"
+
+# ── MCP servers (same set as Claude / Cursor / OpenCode / Command Code / Kimchi) ─
+
+[mcp_servers.codegraph]
+command = "/Users/kishore/.local/bin/codegraph"
+args = ["serve", "--mcp", "--path", "."]
+enabled = true
+
+[mcp_servers.headroom]
+command = "/Users/kishore/.local/bin/headroom"
+args = ["mcp", "serve"]
+enabled = true
+
+[mcp_servers.code-review-graph]
+command = "/Users/kishore/.local/bin/code-review-graph"
+args = ["serve"]
+enabled = true
+
+[mcp_servers.claude-mem]
+command = "/Users/kishore/.nvm/versions/node/v22.12.0/bin/node"
+args = [
+  "/Users/kishore/.claude/plugins/marketplaces/thedotmack/plugin/scripts/mcp-server.cjs",
+]
+enabled = true

@@ -152,6 +152,10 @@ in
       cc = "claude --dangerously-skip-permissions";
       cmd = "command-code";
       oc = "opencode";
+      # Cursor CLI - use cursor-agent (not `agent`) so it doesn't collide with Grok
+      ca = "cursor-agent";
+      # Grok Build / xAI CLI (https://x.ai/cli) - binary is also `agent`, prefer `grok`/`gx`
+      gx = "grok";
 
       # parallel agent worktrees (treehouse)
       th = "treehouse";
@@ -231,12 +235,18 @@ in
   home.file.".config/kimchi/harness/mcp.json".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.config/kimchi/harness/mcp.json";
 
-  # Agent rules: one source file, three clients
+  # Agent rules: one source file, shared across clients
   home.file.".claude/CLAUDE.md".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
   home.file.".codex/AGENTS.md".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
   home.file.".config/opencode/AGENTS.md".source =
+    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
+  # Pi loads global instructions from ~/.pi/agent/AGENTS.md
+  home.file.".pi/agent/AGENTS.md".source =
+    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
+  # Grok Build loads global rules from ~/.grok/AGENTS.md
+  home.file.".grok/AGENTS.md".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
 
   # Claude Code settings (theme + permissions; secrets in ~/.claude/settings.local.json)
@@ -250,4 +260,12 @@ in
   # Cursor CLI MCP config (global scope, applies across all projects)
   home.file.".cursor/mcp.json".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.cursor/mcp.json";
+
+  # Pi coding agent settings (theme, skills paths; auth stays in ~/.pi/agent/auth.json)
+  home.file.".pi/agent/settings.json".source =
+    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.pi/agent/settings.json";
+
+  # Grok Build / xAI CLI config (MCP, skills, UI; auth stays in ~/.grok/auth.json)
+  home.file.".grok/config.toml".source =
+    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.grok/config.toml";
 }

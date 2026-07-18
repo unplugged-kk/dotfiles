@@ -26,8 +26,7 @@
       "mcp__codegraph__*",
       "mcp__headroom__*",
       "mcp__code-review-graph__*",
-      "mcp__claude-mem__*",
-      "mcp__atlassian__*"
+      "mcp__claude-mem__*"
     ],
     "defaultMode": "acceptEdits"
   },
@@ -118,10 +117,6 @@
       "args": [
         "/Users/kishore/.claude/plugins/marketplaces/thedotmack/plugin/scripts/mcp-server.cjs"
       ]
-    },
-    "atlassian": {
-      "type": "http",
-      "url": "https://mcp.atlassian.com/v1/mcp/authv2"
     }
   },
   "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "1",

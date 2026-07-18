@@ -16,10 +16,6 @@
       "command": "/Users/kishore/.nvm/versions/node/v22.12.0/bin/node",
       "args": ["/Users/kishore/.claude/plugins/marketplaces/thedotmack/plugin/scripts/mcp-server.cjs"]
     },
-    "atlassian": {
-      "command": "npx",
-      "args": ["-y", "mcp-remote", "https://mcp.atlassian.com/v1/mcp/authv2"]
-    },
     "caveman-shrink": {
       "command": "npx",
       "args": ["-y", "caveman-shrink"],
