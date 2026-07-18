@@ -253,6 +253,23 @@ else
   echo "    command-code $(command-code --version 2>&1 | head -1) installed"
 fi
 
+# OpenCode (https://opencode.ai/) - terminal coding agent. Official installer
+# puts the binary in ~/.opencode/bin/opencode. We also symlink it into
+# ~/.local/bin so it stays on PATH even when ~/.opencode/bin is missing from
+# a shell's PATH (path_helper / non-login sessions). Config is symlinked from
+# home/.config/opencode/ via home.nix. Shell alias: oc.
+if [ -x "$HOME/.opencode/bin/opencode" ]; then
+  echo "    opencode already installed: $("$HOME/.opencode/bin/opencode" --version 2>&1 | head -1)"
+else
+  curl -fsSL https://opencode.ai/install | bash
+  echo "    opencode installed: $("$HOME/.opencode/bin/opencode" --version 2>&1 | head -1)"
+fi
+mkdir -p "$HOME/.local/bin"
+if [ -x "$HOME/.opencode/bin/opencode" ]; then
+  ln -sfn "$HOME/.opencode/bin/opencode" "$HOME/.local/bin/opencode"
+  echo "    opencode symlink: $HOME/.local/bin/opencode -> $HOME/.opencode/bin/opencode"
+fi
+
 # Cursor CLI (https://cursor.com/docs/cli/overview) - install via official
 # installer. Prefer the unambiguous binary name `cursor-agent` (also installs
 # `agent`, which collides with Grok's `~/.local/bin/agent` symlink). MCP config
@@ -368,6 +385,7 @@ echo "      code-review-graph $("$HOME/.local/bin/code-review-graph" --version 2
 echo "      cursor-agent      $("$HOME/.local/bin/cursor-agent" --version 2>&1 | head -1)"
 echo "      pi                $(pi --version 2>&1 | head -1)"
 echo "      grok              $(grok --version 2>&1 | head -1)"
+echo "      opencode          $("$HOME/.local/bin/opencode" --version 2>&1 | head -1)"
 echo "      firstmate         $FIRSTMATE_DIR"
 echo ""
 echo "    MCP servers (available in all agents):"

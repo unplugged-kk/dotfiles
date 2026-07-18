@@ -151,7 +151,9 @@ in
       # agent shortcuts - high-agency, know what these do before using
       cc = "claude --dangerously-skip-permissions";
       cmd = "command-code";
-      oc = "opencode";
+      # Absolute path: some shells drop ~/.opencode/bin from PATH; bootstrap also
+      # symlinks this binary to ~/.local/bin/opencode.
+      oc = "${homeDir}/.opencode/bin/opencode";
       # Cursor CLI - use cursor-agent (not `agent`) so it doesn't collide with Grok
       ca = "cursor-agent";
       # Grok Build / xAI CLI (https://x.ai/cli) - binary is also `agent`, prefer `grok`/`gx`
