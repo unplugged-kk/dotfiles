@@ -151,13 +151,13 @@ in
       # agent shortcuts - high-agency, know what these do before using
       cc = "claude --dangerously-skip-permissions";
       cmd = "command-code";
-      # Absolute path: some shells drop ~/.opencode/bin from PATH; bootstrap also
-      # symlinks this binary to ~/.local/bin/opencode.
+      # Absolute paths so aliases work even when PATH is incomplete or aliases
+      # are skipped. Bootstrap also installs shims under ~/.local/bin (ca, gx, oc).
       oc = "${homeDir}/.opencode/bin/opencode";
-      # Cursor CLI - use cursor-agent (not `agent`) so it doesn't collide with Grok
-      ca = "cursor-agent";
-      # Grok Build / xAI CLI (https://x.ai/cli) - binary is also `agent`, prefer `grok`/`gx`
-      gx = "grok";
+      # Cursor CLI - prefer cursor-agent over `agent` (Grok owns that name)
+      ca = "${homeDir}/.local/bin/cursor-agent";
+      # Grok Build / xAI CLI (https://x.ai/cli)
+      gx = "${homeDir}/.local/bin/grok";
 
       # parallel agent worktrees (treehouse)
       th = "treehouse";

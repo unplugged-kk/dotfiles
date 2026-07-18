@@ -291,6 +291,11 @@ else
   fi
   echo "    cursor CLI installed: $("$HOME/.local/bin/cursor-agent" --version 2>&1 | head -1)"
 fi
+# Short command name that works without zsh aliases (shell alias `ca` still set in home.nix)
+if [ -x "$HOME/.local/bin/cursor-agent" ]; then
+  ln -sfn "$HOME/.local/bin/cursor-agent" "$HOME/.local/bin/ca"
+  echo "    cursor-agent shim: $HOME/.local/bin/ca -> cursor-agent"
+fi
 
 # Pi coding agent (https://pi.dev/) - npm global package. Uses ~/.pi/agent for
 # settings, AGENTS.md, skills, sessions. AGENTS.md + settings.json are
@@ -311,6 +316,15 @@ if command -v grok >/dev/null 2>&1; then
 else
   curl -fsSL https://x.ai/cli/install.sh | bash
   echo "    grok installed: $(grok --version 2>&1 | head -1)"
+fi
+# Short command name that works without zsh aliases (shell alias `gx` still set in home.nix)
+if [ -x "$HOME/.local/bin/grok" ]; then
+  ln -sfn "$HOME/.local/bin/grok" "$HOME/.local/bin/gx"
+  echo "    grok shim: $HOME/.local/bin/gx -> grok"
+elif [ -x "$HOME/.grok/bin/grok" ]; then
+  ln -sfn "$HOME/.grok/bin/grok" "$HOME/.local/bin/grok"
+  ln -sfn "$HOME/.local/bin/grok" "$HOME/.local/bin/gx"
+  echo "    grok shim: $HOME/.local/bin/gx -> grok"
 fi
 
 echo "==> Step 12: headroom (token compression layer - 20-95% fewer tokens)"
