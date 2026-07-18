@@ -182,15 +182,37 @@ Copilot CLI manages MCP servers interactively via the `/mcp` slash command insid
 
 After adding, run `/mcp` again to confirm servers show "connected" status.
 
-### Skills (92 total across all agents)
-Skills live in `~/.agents/skills/` (61 cross-agent) + `~/.claude/skills/` (92 total including mattpocock and addyosmani packs). All symlinked to Claude Code, available in OpenCode and Kimchi.
+### Skills (~75 in the shared hub, mirrored to all agents)
 
-**Skill packs installed:**
-- `~/.agents/skills/` - 61 skills: caveman, grill-me, tdd, code-review, walkthrough, wayfinder, implement, pr-raise, diagnosing-bugs, and 52 more
-- mattpocock/skills - grill-with-docs, to-spec, to-tickets, implement, wayfinder, triage, domain-modeling, code-review, TDD
-- addyosmani/agent-skills - 24 production skills: spec, plan, build, test, review, ship lifecycle
+Canonical hub: `~/.agents/skills/`. Bootstrap installs skill packs with the [Agent Skills](https://agentskills.io) CLI, then **symlinks every skill** into:
 
-All five are from [kunchenguid](https://github.com/kunchenguid) and installed by `bootstrap.sh`.
+`~/.claude/skills`, `~/.codex/skills`, `~/.cursor/skills`, `~/.grok/skills`, `~/.pi/agent/skills`, `~/.opencode/skills`, `~/.commandcode/skills`, `~/.gemini/skills`, `~/.copilot/skills`
+
+| Pack | Source | What you get |
+|------|--------|--------------|
+| **mattpocock/skills** | [mattpocock/skills](https://github.com/mattpocock/skills) | ~41 skills: grill-me, wayfinder, implement, to-spec, to-tickets, tdd, domain-modeling, code-review, handoff, ... |
+| **addyosmani/agent-skills** | [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) | ~24 production skills: spec-driven-development, planning-and-task-breakdown, security-and-hardening, shipping-and-launch, using-agent-skills, ... |
+| **last30days** | [kishoreHQ/last30days-skill](https://github.com/kishoreHQ/last30days-skill) | Research any topic across Reddit, X, YouTube, HN, Polymarket, GitHub, web |
+
+```bash
+# Install / refresh (also done by bootstrap steps 13-14):
+npx skills add mattpocock/skills -g --all
+npx skills add addyosmani/agent-skills -g --all
+npx skills add kishoreHQ/last30days-skill -g --all
+npx skills update -g
+
+# Examples
+/grill-me
+/wayfinder
+/spec-driven-development
+/last30days Peter Steinberger
+
+# last30days health check (no research run):
+python3 ~/.agents/skills/last30days/scripts/last30days.py --preflight
+# Grok also has a native plugin for last30days (marketplace in home/.grok/config.toml)
+```
+
+Reddit / HN / Polymarket / GitHub for last30days work with zero config. First real run can unlock X, YouTube, arXiv, etc.
 
 ### Shell (zsh)
 - Autosuggestions + syntax highlighting, `Ctrl+f` to accept

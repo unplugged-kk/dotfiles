@@ -24,6 +24,11 @@ official_marketplace_auto_installed = true
 name = "xAI Official"
 git = "https://github.com/xai-org/plugin-marketplace.git"
 
+# last30days research skill (https://github.com/kishoreHQ/last30days-skill)
+[[marketplace.sources]]
+name = "last30days-skill"
+git = "https://github.com/kishoreHQ/last30days-skill.git"
+
 # ── MCP servers (same set as Claude / Cursor / OpenCode / Command Code / Kimchi) ─
 
 [mcp_servers.codegraph]

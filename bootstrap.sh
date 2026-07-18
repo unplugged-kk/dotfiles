@@ -349,26 +349,60 @@ else
   pip3 install mcp 2>&1 | tail -1
 fi
 
-echo "==> Step 13: agent skills (mattpocock/skills + addyosmani/agent-skills)"
-# Clone and install addyosmani/agent-skills into ~/.claude/skills/
-ADDY_SKILLS_TMP="$(mktemp -d)"
-git clone --depth 1 https://github.com/addyosmani/agent-skills "$ADDY_SKILLS_TMP" 2>/dev/null
-if [ -d "$ADDY_SKILLS_TMP/skills" ]; then
-  mkdir -p "$HOME/.claude/skills"
-  cp -rn "$ADDY_SKILLS_TMP/skills/"* "$HOME/.claude/skills/" 2>/dev/null || true
-  echo "    addyosmani/agent-skills installed to ~/.claude/skills/"
-fi
-rm -rf "$ADDY_SKILLS_TMP"
-
-echo "==> Step 14: wire ~/.agents/skills to ~/.claude/skills (61 cross-agent skills)"
-mkdir -p "$HOME/.claude/skills"
-for skill_dir in "$HOME/.agents/skills/"*/; do
-  skill_name=$(basename "$skill_dir")
-  if [ ! -e "$HOME/.claude/skills/$skill_name" ]; then
-    ln -sf "$skill_dir" "$HOME/.claude/skills/$skill_name"
+echo "==> Step 13: global agent skill packs (Agent Skills standard)"
+# Install into ~/.agents/skills and register for every host that supports global
+# skills (Claude, Codex, Cursor, OpenCode, Gemini, Copilot, Cline, ...).
+# Eve/PromptScript do not support global install and are expected to fail.
+# Upgrade later:
+#   npx skills update -g
+#   npx skills add <owner/repo> -g --all
+install_skill_pack() {
+  local repo="$1"
+  local marker_skill="$2"   # one skill name that proves the pack is present
+  if [ -d "$HOME/.agents/skills/$marker_skill" ]; then
+    echo "    $repo already present (found $marker_skill), skipping install"
+  else
+    echo "    installing $repo ..."
+    npx --yes skills add "$repo" -g --all 2>&1 | tail -15
   fi
+}
+install_skill_pack "mattpocock/skills" "grill-me"
+install_skill_pack "addyosmani/agent-skills" "using-agent-skills"
+install_skill_pack "kishoreHQ/last30days-skill" "last30days"
+
+echo "==> Step 14: symlink ~/.agents/skills into every agent skill dir"
+# Agents that only scan their private skills/ folder still see the shared pack.
+AGENT_SKILL_DIRS=(
+  "$HOME/.claude/skills"
+  "$HOME/.codex/skills"
+  "$HOME/.cursor/skills"
+  "$HOME/.grok/skills"
+  "$HOME/.pi/agent/skills"
+  "$HOME/.opencode/skills"
+  "$HOME/.commandcode/skills"
+  "$HOME/.gemini/skills"
+  "$HOME/.copilot/skills"
+)
+for dest_parent in "${AGENT_SKILL_DIRS[@]}"; do
+  mkdir -p "$dest_parent"
+  for skill_dir in "$HOME/.agents/skills/"*/; do
+    [ -d "$skill_dir" ] || continue
+    skill_name=$(basename "$skill_dir")
+    ln -sfn "$skill_dir" "$dest_parent/$skill_name"
+  done
+  echo "    $dest_parent: $(ls -1 "$dest_parent" 2>/dev/null | wc -l | tr -d ' ') skills"
 done
-echo "    $(ls "$HOME/.claude/skills/" | wc -l | tr -d ' ') skills available in ~/.claude/skills/"
+
+# Grok native plugin for last30days (marketplace source in home/.grok/config.toml)
+if command -v grok >/dev/null 2>&1; then
+  if grok plugin list 2>/dev/null | grep -qi last30days; then
+    echo "    grok plugin last30days already installed"
+  else
+    grok plugin marketplace add kishoreHQ/last30days-skill 2>/dev/null || true
+    grok plugin install last30days --trust 2>&1 | tail -5 || \
+      grok plugin install kishoreHQ/last30days-skill --trust 2>&1 | tail -5 || true
+  fi
+fi
 
 echo "==> Step 15: code-review-graph (PR-level structural review, https://github.com/tirth8205/code-review-graph)"
 # Installed via 'uv tool install' (modern pipx equivalent). uv is already on PATH
@@ -408,5 +442,5 @@ echo "      headroom          - token compression"
 echo "      code-review-graph - PR structural review"
 echo "      claude-mem        - cross-session memory"
 echo ""
-echo "    Skills ($(ls "$HOME/.claude/skills/" | wc -l | tr -d ' ') total in ~/.claude/skills/):"
-echo "      mattpocock/skills, addyosmani/agent-skills, ~/.agents/skills (61 skills)"
+echo "    Skills ($(ls "$HOME/.agents/skills/" 2>/dev/null | wc -l | tr -d ' ') in ~/.agents/skills, mirrored to Claude/Codex/Cursor/Grok/Pi/OpenCode/CommandCode/Gemini/Copilot):"
+echo "      mattpocock/skills (~41), addyosmani/agent-skills (~24), last30days, + other packs"
