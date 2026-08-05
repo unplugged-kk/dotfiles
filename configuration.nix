@@ -101,6 +101,7 @@
       "devops-rob/tap"      # target
       "coder/coder"         # coder (remote dev environments)
       "getkimchi/tap"       # kimchi CLI
+      "augani/dory"         # dory (docker alternative)
     ];
 
     brews = [
@@ -186,6 +187,9 @@
       # networking / utilities
       "tailscale-app"
       "localsend"
+
+      # containers
+      "dory"  # docker alternative daemon, also brew-managed via `docker` above
 
       # NOTE: brave-browser is installed via DMG - macOS SIP prevents brew
       # from taking ownership of it. Manage it manually outside this config.
