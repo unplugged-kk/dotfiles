@@ -9,8 +9,15 @@ REAL_USER="$(whoami)"
 case "$PLATFORM" in
   Darwin)
     # macOS: full nix-darwin + home-manager + nix-homebrew bundle
-    activate()      { sudo /run/current-system/sw/bin/darwin-rebuild switch --flake "$DIR#mac"; }
-    activate_dry()  { sudo /run/current-system/sw/bin/darwin-rebuild build  --flake "$DIR#mac" || true; }
+    #
+    # Third-party taps carrying casks (e.g. augani/dory) need an explicit
+    # `brew trust` before Homebrew will load them - otherwise `brew bundle`
+    # (run by nix-homebrew during activation) fails with "Refusing to load
+    # cask ... from untrusted tap". Trust is idempotent and persists in
+    # trust.json, so re-running this is a no-op once trusted.
+    trust_taps() { brew trust --taps augani/dory >/dev/null 2>&1 || true; }
+    activate()      { trust_taps; sudo /run/current-system/sw/bin/darwin-rebuild switch --flake "$DIR#mac"; }
+    activate_dry()  { trust_taps; sudo /run/current-system/sw/bin/darwin-rebuild build  --flake "$DIR#mac" || true; }
     pkg_upgrade()   { brew upgrade --greedy || true; }
     ;;
   Linux)
