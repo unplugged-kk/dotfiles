@@ -14,10 +14,17 @@ goto             = "prefix+g"
 copy_mode  = "prefix+y"  # herdr's copy-mode entry key; copy-mode's own internal keys (v/space select, y/Enter copy, q/Esc cancel) aren't configurable
 
 # herdr-file-viewer (smarzban/herdr-file-viewer) - git-aware file viewer
-# open in a split beside the current pane
-open_file_viewer     = "prefix+shift+f"
-# open in its own tab (switches to existing viewer tab rather than duplicating)
-open_file_viewer_tab = "prefix+shift+t"
+[[keys.command]]
+key = "prefix+shift+f"
+type = "plugin_action"
+command = "herdr-file-viewer.open-file-viewer"
+description = "open file viewer in split"
+
+[[keys.command]]
+key = "prefix+shift+t"
+type = "plugin_action"
+command = "herdr-file-viewer.open-file-viewer-tab"
+description = "open file viewer in tab"
 
 [ui]
 # Agents panel order: explicit choice of "spaces" (grouped by space, the default) over "priority".
