@@ -182,7 +182,7 @@ Copilot CLI manages MCP servers interactively via the `/mcp` slash command insid
 
 After adding, run `/mcp` again to confirm servers show "connected" status.
 
-### Skills (~75 in the shared hub, mirrored to all agents)
+### Skills (~96 in the shared hub, mirrored to all agents)
 
 Canonical hub: `~/.agents/skills/`. Bootstrap installs skill packs with the [Agent Skills](https://agentskills.io) CLI, then **symlinks every skill** into:
 
@@ -193,12 +193,24 @@ Canonical hub: `~/.agents/skills/`. Bootstrap installs skill packs with the [Age
 | **mattpocock/skills** | [mattpocock/skills](https://github.com/mattpocock/skills) | ~41 skills: grill-me, wayfinder, implement, to-spec, to-tickets, tdd, domain-modeling, code-review, handoff, ... |
 | **addyosmani/agent-skills** | [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) | ~24 production skills: spec-driven-development, planning-and-task-breakdown, security-and-hardening, shipping-and-launch, using-agent-skills, ... |
 | **last30days** | [kishoreHQ/last30days-skill](https://github.com/kishoreHQ/last30days-skill) | Research any topic across Reddit, X, YouTube, HN, Polymarket, GitHub, web |
+| **humanizer** | [blader/humanizer](https://github.com/blader/humanizer) | Strip AI-writing tells (em dashes, rule-of-three, filler) from text |
+| **ai-design-skills** | [elayadesign/ai-design-skills](https://github.com/elayadesign/ai-design-skills) | Landing pages, design systems, slides, UI styling |
+| **buzz-skills** | [tonbistudio/buzz-skills](https://github.com/tonbistudio/buzz-skills) | Buzz chat media attachments, self-hosting, Hermes integration |
+| **emilkowalski/skills** | [emilkowalski/skills](https://github.com/emilkowalski/skills) | UI polish, animation review/audit, component design philosophy |
+| **ui-ux-pro-max** | [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | Styles/palettes/font-pairing/UX guideline database across 22 stacks |
+| **vercel-labs/skills** | [vercel-labs/skills](https://github.com/vercel-labs/skills) | find-skills: discover and install other skills |
 
 ```bash
 # Install / refresh (also done by bootstrap steps 13-14):
 npx skills add mattpocock/skills -g --all
 npx skills add addyosmani/agent-skills -g --all
 npx skills add kishoreHQ/last30days-skill -g --all
+npx skills add blader/humanizer -g --all
+npx skills add elayadesign/ai-design-skills -g --all
+npx skills add tonbistudio/buzz-skills -g --all
+npx skills add emilkowalski/skills -g --all
+npx skills add nextlevelbuilder/ui-ux-pro-max-skill -g --all
+npx skills add vercel-labs/skills -g --all
 npx skills update -g
 
 # Examples

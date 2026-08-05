@@ -369,6 +369,12 @@ install_skill_pack() {
 install_skill_pack "mattpocock/skills" "grill-me"
 install_skill_pack "addyosmani/agent-skills" "using-agent-skills"
 install_skill_pack "kishoreHQ/last30days-skill" "last30days"
+install_skill_pack "blader/humanizer" "humanizer"
+install_skill_pack "elayadesign/ai-design-skills" "landing-page-design"
+install_skill_pack "tonbistudio/buzz-skills" "buzz-media-attachments"
+install_skill_pack "emilkowalski/skills" "emil-design-eng"
+install_skill_pack "nextlevelbuilder/ui-ux-pro-max-skill" "ui-ux-pro-max"
+install_skill_pack "vercel-labs/skills" "find-skills"
 
 echo "==> Step 14: symlink ~/.agents/skills into every agent skill dir"
 # Agents that only scan their private skills/ folder still see the shared pack.
