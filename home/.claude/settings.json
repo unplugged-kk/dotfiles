@@ -76,7 +76,8 @@
     "claude-code-setup@claude-plugins-official": true,
     "claude-mem@thedotmack": true,
     "gopls-lsp@claude-plugins-official": true,
-    "warp@claude-code-warp": true
+    "warp@claude-code-warp": true,
+    "mattpocock-skills@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "caveman": {

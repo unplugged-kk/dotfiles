@@ -1,3 +1,4 @@
+onboarding = false
 [keys]
 prefix = "ctrl+b"
 focus_pane_left  = "prefix+h"
@@ -21,3 +22,6 @@ open_file_viewer_tab = "prefix+shift+t"
 [ui]
 # Agents panel order: explicit choice of "spaces" (grouped by space, the default) over "priority".
 agent_panel_sort = "spaces"
+
+[experimental]
+pane_history = true

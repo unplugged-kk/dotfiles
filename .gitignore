@@ -15,6 +15,7 @@ result-*
 home/.config/herdr/*.log
 home/.config/herdr/*.sock
 home/.config/herdr/session.json
+home/.config/herdr/session-history.json
 home/.config/herdr/release-notes.json
 
 # herdr plugin cache - managed by `herdr plugin install`, NOT dotfiles.
