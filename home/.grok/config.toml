@@ -47,7 +47,7 @@ args = ["serve"]
 enabled = true
 
 [mcp_servers.claude-mem]
-command = "/Users/kishore/.nvm/versions/node/v22.12.0/bin/node"
+command = "/Users/kishore/.nvm/versions/node/v24.18.0/bin/node"
 args = [
   "/Users/kishore/.claude/plugins/marketplaces/thedotmack/plugin/scripts/mcp-server.cjs",
 ]

@@ -1,17 +1,17 @@
 {
   "env": {
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5",
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-8",
     "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5",
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5",
-    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "32000",
-    "MAX_THINKING_TOKENS": "16000",
     "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
     "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "1",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "ENABLE_PROMPT_CACHING_1H": "1",
-    "CLAUDE_ENABLE_STREAM_WATCHDOG": "1",
+    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "32000",
     "CLAUDE_ENABLE_BYTE_WATCHDOG": "1",
-    "CLAUDE_STREAM_IDLE_TIMEOUT_MS": "600000"
+    "CLAUDE_ENABLE_STREAM_WATCHDOG": "1",
+    "CLAUDE_STREAM_IDLE_TIMEOUT_MS": "600000",
+    "ENABLE_PROMPT_CACHING_1H": "1",
+    "MAX_THINKING_TOKENS": "16000"
   },
   "permissions": {
     "allow": [
@@ -30,7 +30,7 @@
     ],
     "defaultMode": "acceptEdits"
   },
-  "model": "claude-sonnet-5",
+  "model": "sonnet",
   "hooks": {
     "PostToolUse": [
       {
@@ -54,21 +54,35 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/kishore/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10
+          }
+        ]
       }
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "input=$(cat); model=$(echo \"$input\" | jq -r '.model.display_name'); used=$(echo \"$input\" | jq -r '.context_window.used_percentage // empty'); if [ -n \"$used\" ]; then printf \"%s | ctx: %.0f%% used\" \"$model\" \"$used\"; else printf \"%s\" \"$model\"; fi"
+  },
   "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": true,
-    "claude-mem@thedotmack": true,
-    "warp@claude-code-warp": true,
     "caveman@caveman": true,
-    "claude-code-setup@claude-plugins-official": true
+    "claude-code-setup@claude-plugins-official": true,
+    "claude-mem@thedotmack": true,
+    "gopls-lsp@claude-plugins-official": true,
+    "warp@claude-code-warp": true
   },
   "extraKnownMarketplaces": {
-    "thedotmack": {
+    "caveman": {
       "source": {
         "source": "github",
-        "repo": "thedotmack/claude-mem"
+        "repo": "JuliusBrussee/caveman"
       }
     },
     "claude-code-warp": {
@@ -77,51 +91,47 @@
         "repo": "warpdotdev/claude-code-warp"
       }
     },
-    "caveman": {
+    "thedotmack": {
       "source": {
         "source": "github",
-        "repo": "JuliusBrussee/caveman"
+        "repo": "thedotmack/claude-mem"
       }
     }
   },
-  "statusLine": {
-    "type": "command",
-    "command": "input=$(cat); model=$(echo \"$input\" | jq -r '.model.display_name'); used=$(echo \"$input\" | jq -r '.context_window.used_percentage // empty'); if [ -n \"$used\" ]; then printf \"%s | ctx: %.0f%% used\" \"$model\" \"$used\"; else printf \"%s\" \"$model\"; fi"
-  },
   "alwaysThinkingEnabled": true,
   "effortLevel": "medium",
+  "tui": "fullscreen",
   "theme": "dark-ansi",
-  "mcpServers": {
-    "codegraph": {
-      "command": "/Users/kishore/.local/bin/codegraph",
-      "args": [
-        "serve",
-        "--mcp"
-      ]
-    },
-    "headroom": {
-      "command": "/Users/kishore/.local/bin/headroom",
-      "args": [
-        "mcp",
-        "serve"
-      ]
-    },
-    "code-review-graph": {
-      "command": "/Users/kishore/.local/bin/code-review-graph",
-      "args": [
-        "serve"
-      ]
-    },
-    "claude-mem": {
-      "command": "/Users/kishore/.nvm/versions/node/v22.12.0/bin/node",
-      "args": [
-        "/Users/kishore/.claude/plugins/marketplaces/thedotmack/plugin/scripts/mcp-server.cjs"
-      ]
-    }
-  },
   "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "1",
   "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
   "ENABLE_PROMPT_CACHING_1H": "1",
   "_note": "Enterprise API keys go in ~/.claude/settings.local.json (gitignored). Obsidian MCP key also goes there.",
-  "tui": "fullscreen"
+  "mcpServers": {
+    "claude-mem": {
+      "args": [
+        "/Users/kishore/.claude/plugins/marketplaces/thedotmack/plugin/scripts/mcp-server.cjs"
+      ],
+      "command": "/Users/kishore/.nvm/versions/node/v24.18.0/bin/node"
+    },
+    "code-review-graph": {
+      "args": [
+        "serve"
+      ],
+      "command": "/Users/kishore/.local/bin/code-review-graph"
+    },
+    "codegraph": {
+      "args": [
+        "serve",
+        "--mcp"
+      ],
+      "command": "/Users/kishore/.local/bin/codegraph"
+    },
+    "headroom": {
+      "args": [
+        "mcp",
+        "serve"
+      ],
+      "command": "/Users/kishore/.local/bin/headroom"
+    }
+  }
 }

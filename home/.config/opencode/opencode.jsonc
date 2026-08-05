@@ -34,7 +34,7 @@
     // Use absolute path to nvm node - MCP child processes don't inherit nvm PATH
     "claude-mem": {
       "type": "local",
-      "command": ["/Users/kishore/.nvm/versions/node/v22.12.0/bin/node", "/Users/kishore/.claude/plugins/marketplaces/thedotmack/plugin/scripts/mcp-server.cjs"],
+      "command": ["/Users/kishore/.nvm/versions/node/v24.18.0/bin/node", "/Users/kishore/.claude/plugins/marketplaces/thedotmack/plugin/scripts/mcp-server.cjs"],
       "enabled": true
     },
 
@@ -51,7 +51,7 @@
   // ── Plugins ────────────────────────────────────────────────────────────────
   // ponytail: lazy senior dev mode - YAGNI, minimal code, no over-engineering
   "plugin": [
-    "/Users/kishore/.nvm/versions/node/v22.12.0/lib/node_modules/@dietrichgebert/ponytail/.opencode/plugins/ponytail.mjs"
+    "/Users/kishore/.local/lib/node_modules/@dietrichgebert/ponytail/.opencode/plugins/ponytail.mjs"
   ],
 
   // ── Permissions (singular "permission" - per-tool allow/ask/deny) ─────────

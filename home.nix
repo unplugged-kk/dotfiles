@@ -17,7 +17,6 @@ in
     fd          # fast find
     fzf         # fuzzy finder
     zoxide      # smarter cd - learns your most-used dirs
-    direnv      # per-directory env vars (.envrc auto-load on cd)
 
     # json / yaml
     jq          # json processor
@@ -81,12 +80,12 @@ in
       "$HOME/.nix-profile/bin"
       "$HOME/.local/bin"
       "$HOME/.opencode/bin"
-      "$HOME/.nvm/versions/node/v22.12.0/bin"
+      "$HOME/.nvm/versions/node/v24.18.0/bin"
     ] else [
       "/opt/homebrew/bin"
       "$HOME/.local/bin"
       "$HOME/.opencode/bin"
-      "$HOME/.nvm/versions/node/v22.12.0/bin"
+      "$HOME/.nvm/versions/node/v24.18.0/bin"
     ];
 
   # ── Shell ─────────────────────────────────────────────────────────────────
@@ -170,6 +169,16 @@ in
       # cd to firstmate home and launch - "ahoy! fix X, add Y, and investigate Z"
       fm = "cd $FIRSTMATE_HOME && claude";
     };
+  };
+
+  # ── direnv ────────────────────────────────────────────────────────────────
+  # Per-directory env vars (.envrc auto-load on cd). nix-direnv caches nix-shell
+  # environments so `use nix` / `use flake` in a .envrc doesn't re-evaluate on
+  # every cd. Replaces the old bare `direnv` package, which was on PATH but
+  # never hooked into the zsh prompt.
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
   };
 
   # ── Prompt ────────────────────────────────────────────────────────────────
