@@ -168,17 +168,11 @@
       # ai agents
       "claude-code"
       "copilot-cli"
-      "ollama-app"
-      "osaurus"
 
       # kubernetes
       "lens"
 
-      # notes / knowledge
-      "obsidian"
-
       # api testing
-      "bruno"
       "postman"
 
       # communication

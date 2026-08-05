@@ -27,7 +27,7 @@ One repo, one command, and a fresh Mac ends up configured identically every time
 | `gh` | GitHub CLI - declared here (not in Nix) so brew's internal subprocesses can find it at `/opt/homebrew/bin/gh` for installing formulas that fetch private releases |
 
 ### Homebrew casks (Mac apps)
-WezTerm, Ghostty, Warp, Cursor, VS Code, Claude Code, GitHub Copilot CLI, Lens, Obsidian, Bruno, Discord, LocalSend
+WezTerm, Ghostty, Warp, Cursor, VS Code, Claude Code, GitHub Copilot CLI, Lens, Postman, Discord, Tailscale, LocalSend, Dory
 
 ### Nix user packages
 | Package | Purpose |
@@ -343,10 +343,10 @@ all `home.nix` packages, all agent tools) is shared with macOS. `bootstrap.sh` a
   git + delta config, lazygit
 
 ### What is skipped on Linux
-- **All 18 Mac casks** (wezterm, ghostty, warp, cursor, vscode, sublime,
-  antigravity, claude-code, copilot-cli, ollama, osaurus, lens,
-  obsidian, bruno, postman, discord, tailscale, localsend). These are
-  macOS apps. Install Linux equivalents manually if needed.
+- **All Mac casks** (wezterm, ghostty, warp, cursor, vscode, sublime,
+  antigravity, claude-code, copilot-cli, lens, postman, discord,
+  tailscale, localsend, dory). These are macOS apps. Install Linux
+  equivalents manually if needed.
 - **`container` brew formula** - Apple-only CLI (Linux has Docker
   instead, installed via apt below).
 - **`docker` / `docker-compose` brew formulae** - replaced by
