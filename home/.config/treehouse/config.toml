@@ -5,9 +5,13 @@
 # 16 gives enough for running several parallel agents without excess disk use.
 max_trees = 16
 
-# Hooks run in the worktree directory at lifecycle points.
-# post_create: runs after a worktree is provisioned, before it's handed to you.
-# pre_destroy: runs before a worktree is removed.
-# [hooks]
-# post_create = ["./scripts/setup.sh"]
-# pre_destroy = ["./scripts/teardown.sh"]
+# Hooks run in the worktree directory at lifecycle points, with cwd set to
+# that worktree - so a project-committed ./scripts/setup.sh is genuinely
+# per-project even though this config is global. post_create runs after a
+# worktree is provisioned, before it's handed to you; without it, every pool
+# slot's first fill needed a manual dependency install before it paid off on
+# reuse. Falls back to `npm install` when a repo has no setup script of its
+# own but does have package.json with no node_modules yet; always exits 0 so
+# a repo without either just gets an empty worktree, same as before.
+[hooks]
+post_create = ["sh", "-c", "test -x ./scripts/setup.sh && exec ./scripts/setup.sh; test -f package.json && [ ! -d node_modules ] && exec npm install; exit 0"]
