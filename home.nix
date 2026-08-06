@@ -1,4 +1,4 @@
-{ config, pkgs, user, homeDir, isLinux ? false, ... }:
+{ config, pkgs, lib, user, homeDir, isLinux ? false, ... }:
 
 let
   dotfiles = "${homeDir}/.dotfiles";
@@ -244,7 +244,7 @@ in
   # sure every `./rebuild.sh` also brings them current, instead of them
   # silently drifting stale between manual runs. Best-effort: a flaky network
   # here must never fail the whole home-manager switch.
-  home.activation.updateAgentCliTools = pkgs.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+  home.activation.updateAgentCliTools = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     run () { PATH="$HOME/.local/bin:$PATH" "$@" >/dev/null 2>&1 || true; }
     if command -v npm >/dev/null 2>&1; then
       run npm install -g gh-axi@latest gnhf@latest
