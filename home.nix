@@ -171,23 +171,6 @@ in
     };
   };
 
-  # ── direnv ────────────────────────────────────────────────────────────────
-  # Per-directory env vars (.envrc auto-load on cd). nix-direnv caches nix-shell
-  # environments so `use nix` / `use flake` in a .envrc doesn't re-evaluate on
-  # every cd. Replaces the old bare `direnv` package, which was on PATH but
-  # never hooked into the zsh prompt.
-  programs.direnv = {
-    enable = true;
-    nix-direnv.enable = true;
-    # Suppress the "direnv: loading/using/export ..." noise on every cd.
-    # log_format = "" does NOT work (empty string is Go's zero-value, so
-    # direnv silently falls back to its default format instead of blanking
-    # it). log_filter is the documented way: a regex that must match a line
-    # for it to print - "^$" matches nothing, so nothing prints. Errors still
-    # surface because direnv writes them outside this log-formatting path.
-    config.global.log_filter = "^$";
-  };
-
   # ── Prompt ────────────────────────────────────────────────────────────────
   programs.starship = {
     enable = true;
