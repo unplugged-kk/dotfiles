@@ -48,6 +48,7 @@ Default: rebuild the system with the current flake.lock (fast, no upgrades).
     3. darwin-rebuild switch    - activate the new generation
     4. brew upgrade             - bump brew packages that have newer versions
     5. nix profile upgrade '.*'  - bump user-profile packages (none currently)
+    6. scripts/update-tools.sh  - bump agent tools (npm globals, binaries, plugins)
 
   Each step is skipped automatically if there's nothing to do.
 
@@ -136,6 +137,15 @@ echo "==> 5/5: nix profile upgrade (user-profile packages)"
 # Currently empty (everything is declarative via configuration.nix / home.nix),
 # but kept for future when ad-hoc packages get installed via `nix profile install`.
 nix profile upgrade '.*' 2>/dev/null || echo "    (no user-profile packages to upgrade)"
+echo ""
+
+echo "==> 6/6: agent tools update (npm globals, GitHub-release binaries, herdr plugins)"
+# Best-effort: a flaky network here must never fail the whole upgrade.
+if [ -x "$DIR/scripts/update-tools.sh" ]; then
+  "$DIR/scripts/update-tools.sh" || echo "    (agent tools update failed - continuing)"
+else
+  echo "    scripts/update-tools.sh missing - skipping"
+fi
 echo ""
 
 rm -f "$LOCK_BAK"

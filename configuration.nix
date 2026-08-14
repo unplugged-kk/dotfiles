@@ -18,7 +18,8 @@
   # /opt/homebrew/bin holds brew/cask binaries (gh, copilot, etc.). ~/.local/bin
   # holds user-installed binaries (claude, headroom, code-review-graph,
   # codegraph, kimchi, opencode symlink). ~/.opencode/bin holds the opencode binary.
-  # ~/.nvm/versions/node/v24.18.0/bin holds node + npm + npx + commandcode.
+  # ~/.nvm/current/bin holds node + npm + npx + commandcode - `current` is
+  # maintained by bootstrap.sh's `nvm use --lts`.
   # home.sessionPath in home.nix sets these too, but environment.systemPath overrides
   # in non-interactive shells (MCP server spawn, cron, etc.) so we set them here.
   environment.systemPath = [
@@ -27,8 +28,9 @@
     "/etc/profiles/per-user/${user}/bin"
     "${homeDir}/.nix-profile/bin"
     "${homeDir}/.local/bin"
+    "${homeDir}/go/bin"
     "${homeDir}/.opencode/bin"
-    "${homeDir}/.nvm/versions/node/v24.18.0/bin"
+    "${homeDir}/.nvm/current/bin"
   ];
 
   # ── Session environment variables (system-wide, propagated to sudo) ───────

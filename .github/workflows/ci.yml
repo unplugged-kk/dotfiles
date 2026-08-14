@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Validate dotfiles
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Secrets scan (tracked tree)
+        run: ./scripts/check-secrets.sh --tree
+
+      - name: JSON/JSONC syntax check
+        run: ./scripts/check-json.sh
+
+      - name: Nix flake check (no build)
+        uses: DeterminateSystems/nix-installer-action@v16
+      - uses: DeterminateSystems/magic-nix-cache-action@v9
+      - run: nix flake check --no-build

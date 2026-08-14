@@ -155,6 +155,23 @@ else
   echo "    Node.js $(node --version) installed via nvm"
 fi
 
+# Always ensure the LTS is installed and active. `nvm use --lts` maintains
+# $NVM_DIR/current, which home.nix/configuration.nix put on PATH
+# (~/.nvm/current/bin). This keeps PATH pointing at the right node even after
+# an LTS upgrade, instead of a hardcoded version.
+set +u
+# shellcheck disable=SC1091
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+set -u
+nvm install --lts 2>/dev/null || nvm install --lts
+nvm use --lts
+
+# `node` and friends must resolve even outside an interactive nvm shell
+# (MCP servers, cron, rebuild.sh). Keep a stable symlink in ~/.local/bin.
+mkdir -p "$HOME/.local/bin"
+ln -sfn "$(nvm which current)" "$HOME/.local/bin/node"
+echo "    Node.js $(node --version) installed via nvm (current -> $HOME/.nvm/current)"
+
 echo "==> Step 7: ~/.local/bin — no-mistakes and treehouse"
 mkdir -p "$HOME/.local/bin"
 

@@ -38,6 +38,17 @@ in
     zip
     unzip
 
+    # network / classic tools
+    inetutils   # telnet, hostname, etc.
+
+    # database clients
+    postgresql  # psql
+
+    # languages
+    go
+    golangci-lint
+    delve
+
     # kubernetes
     kubectl     # kubernetes cli (k)
     k9s         # kubernetes TUI
@@ -69,7 +80,9 @@ in
   # ── PATH additions ────────────────────────────────────────────────────────
   # Mac: /opt/homebrew/bin holds brew/cask binaries. ~/.local/bin holds
   # user-installed binaries (no-mistakes, treehouse, etc.). ~/.opencode/bin
-  # holds the opencode CLI. ~/.nvm/versions/node/<v>/bin holds node + npm.
+  # holds the opencode CLI. ~/.nvm/current/bin holds node + npm + npx + global
+  # npm packages - `current` is maintained by bootstrap.sh's `nvm use --lts`,
+  # so an LTS upgrade doesn't require editing this path.
   # Mirrored in configuration.nix:24 environment.systemPath for non-interactive
   # shells on macOS.
   #
@@ -80,12 +93,12 @@ in
       "$HOME/.nix-profile/bin"
       "$HOME/.local/bin"
       "$HOME/.opencode/bin"
-      "$HOME/.nvm/versions/node/v24.18.0/bin"
+      "$HOME/.nvm/current/bin"
     ] else [
       "/opt/homebrew/bin"
       "$HOME/.local/bin"
       "$HOME/.opencode/bin"
-      "$HOME/.nvm/versions/node/v24.18.0/bin"
+      "$HOME/.nvm/current/bin"
     ];
 
   # ── Shell ─────────────────────────────────────────────────────────────────
@@ -93,6 +106,18 @@ in
     enable = true;
     autosuggestion.enable    = true;   # ghost text from history
     syntaxHighlighting.enable = true;  # commands turn green when valid
+    # Completion init: use the cached compdump when present (fast, ~0.2s
+    # startup instead of ~1.4s), but build it on the first run so a fresh
+    # machine still gets completions. `compinit -C` alone does NOT generate
+    # a missing dump - hence the fallback.
+    completionInit = ''
+      autoload -U compinit
+      if [[ -r $HOME/.zcompdump ]]; then
+        compinit -C
+      else
+        compinit
+      fi
+    '';
     initContent = ''
       # accept autosuggestion with Ctrl+f
       bindkey '^f' autosuggest-accept
@@ -110,6 +135,7 @@ in
       push     = "git push";
       pushf    = "git push --force-with-lease";  # safer force push
       pull     = "git pull";
+      co       = "git checkout";
       m        = "git switch main";
       amend    = "git commit --amend --no-edit";
       undo     = "git reset --soft HEAD^";
@@ -208,10 +234,21 @@ in
       color.ui             = true;
       pull.rebase          = true;
       push.autoSetupRemote = true;
+      push.followTags      = true;
       rebase.updateRefs    = true;   # auto-update stacked branches on rebase
       init.defaultBranch   = "main";
       credential.helper    = "osxkeychain";
       http.postBuffer      = 524288000;  # 500 MB for large enterprise repos
+
+      # URL shorthands: `gh:owner/repo` clones via SSH, `gst:...` for gists.
+      url."git@github.com:".insteadOf = "gh:";
+      url."git@gist.github.com:".insteadOf = "gst:";
+
+      # Show most recently changed branches first.
+      branch.sort = "-committerdate";
+
+      # Auto-correct typos in git commands (1 = low confidence, instant).
+      help.autocorrect = 1;
     };
   };
 

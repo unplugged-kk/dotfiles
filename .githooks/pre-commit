@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# pre-commit hook: guard against committing secrets to the dotfiles repo.
+# Wired up via `git config core.hooksPath .githooks` (see Makefile).
+
+set -u
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+if [ -x "$REPO_ROOT/scripts/check-secrets.sh" ]; then
+  if ! "$REPO_ROOT/scripts/check-secrets.sh"; then
+    echo "pre-commit: secrets guard blocked the commit." >&2
+    exit 1
+  fi
+fi
+
+exit 0

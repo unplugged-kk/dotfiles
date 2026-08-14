@@ -1,9 +1,12 @@
-# macOS metadata
-.DS_Store
-
-# Nix build artifacts (in case anyone runs nix build in the repo root)
-result
-result-*
+# herdr runtime artifacts (regenerated at runtime; never commit)
+home/.config/herdr/*.log
+home/.config/herdr/session.json
+home/.config/herdr/session-history.json
+home/.config/herdr/*.sock
+home/.config/herdr/release-notes.json
+home/.config/herdr/.plugins.lock
+home/.config/herdr/plugins.json
+home/.config/herdr/plugins/
 
 # Editor / IDE scratch
 *.swp
@@ -11,18 +14,18 @@ result-*
 .idea/
 .vscode/
 
-# herdr runtime state (logs, sockets, session cache)
-home/.config/herdr/*.log
-home/.config/herdr/*.sock
-home/.config/herdr/session.json
-home/.config/herdr/session-history.json
-home/.config/herdr/release-notes.json
+# macOS + nix build noise
+.DS_Store
+result
+result-*
 
-# herdr plugin cache - managed by `herdr plugin install`, NOT dotfiles.
-# Version-hashed dir names like github/herdr-file-viewer-c993314e2614/
-# (re-cloned on every herdr plugin update; never commit the clone or its
-# target/release/ binary).
-home/.config/herdr/plugins/github/
+# no-mistakes local validation state - never commit in this public repo
+.no-mistakes/
 
-# herdr plugin registry (rewritten by `herdr plugin install/uninstall`)
-home/.config/herdr/plugins.json
+# secrets - never commit
+home/.claude/settings.local.json
+*.local.json
+*.secrets
+.env
+.env.*
+!.env.example
