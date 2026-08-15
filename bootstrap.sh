@@ -133,16 +133,24 @@ case "$PLATFORM" in
     # checks for these taps, use HOMEBREW_AUTO_UPDATE_SECS or HOMEBREW_NO_ENV_HINTS.
     # `nix run github:nix-darwin/...` re-resolves the branch ref via GitHub's
     # API. As root (sudo) that call is unauthenticated and hits the 60/hr rate
-    # limit ("HTTP error 403"). Two defenses, in order:
-    #   1. Prefer the committed flake.lock (already pins nix-darwin's exact rev)
-    #      by building from the local flake - zero GitHub API calls.
-    #   2. If the lock is stale/missing, feed gh's token through NIX_CONFIG so
-    #      nix's github.com fetches authenticate even for the root subprocess
-    #      (same pattern rebuild.sh uses for `nix flake update`).
+    # limit ("HTTP error 403"). Three defenses, in order:
+    #   1. If darwin-rebuild is already on the system (prior switch), use it
+    #      directly - zero network, zero store lookups. This is the common
+    #      re-bootstrap case.
+    #   2. Otherwise, run the pinned darwin-rebuild from the committed
+    #      flake.lock by building the flake's `darwin-rebuild` package - no
+    #      GitHub API ref resolution.
+    #   3. Last resort (stale/missing lock): feed gh's token through
+    #      NIX_CONFIG so nix's github.com fetches authenticate even for the
+    #      root subprocess (same pattern rebuild.sh uses for `nix flake
+    #      update`).
     NIX_BIN="$(command -v nix)"
-    if [ -f "$DIR/flake.lock" ] && grep -q '"nix-darwin"' "$DIR/flake.lock"; then
-      sudo "$NIX_BIN" run "$DIR#darwinConfigurations.mac.system" -- \
-        switch --flake "$DIR#mac"
+    if [ -x /run/current-system/sw/bin/darwin-rebuild ]; then
+      sudo /run/current-system/sw/bin/darwin-rebuild switch --flake "$DIR#mac"
+    elif [ -f "$DIR/flake.lock" ] && grep -q '"nix-darwin"' "$DIR/flake.lock"; then
+      sudo "$NIX_BIN" build "$DIR#darwinConfigurations.mac.system"
+      sudo ./result/sw/bin/darwin-rebuild switch --flake "$DIR#mac"
+      sudo rm -f ./result
     else
       GH_TOKEN_VAL="$(gh auth token 2>/dev/null || true)"
       if [ -n "$GH_TOKEN_VAL" ]; then
