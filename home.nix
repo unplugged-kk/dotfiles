@@ -282,17 +282,17 @@ in
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.config/kimchi/harness/mcp.json";
 
   # ── Agent CLI tooling (kunchenguid ecosystem) ──────────────────────────────
-  # gh-axi / gnhf are npm-global (installed under npm's configured prefix,
-  # ~/.local per `npm config get prefix`); treehouse / no-mistakes are Go
-  # binaries in ~/.local/bin with their own `update` subcommand. None of these
-  # are Nix-packaged, so home-manager can't pin/build them - this just makes
-  # sure every `./rebuild.sh` also brings them current, instead of them
-  # silently drifting stale between manual runs. Best-effort: a flaky network
-  # here must never fail the whole home-manager switch.
+  # gh-axi / gnhf / lavish-axi / tasks-axi are npm-global (installed under npm's
+  # configured prefix, ~/.local per `npm config get prefix`); treehouse /
+  # no-mistakes are Go binaries in ~/.local/bin with their own `update`
+  # subcommand. None of these are Nix-packaged, so home-manager can't pin/build
+  # them - this just makes sure every `./rebuild.sh` also brings them current,
+  # instead of them silently drifting stale between manual runs. Best-effort: a
+  # flaky network here must never fail the whole home-manager switch.
   home.activation.updateAgentCliTools = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     run () { PATH="$HOME/.local/bin:$PATH" "$@" >/dev/null 2>&1 || true; }
     if command -v npm >/dev/null 2>&1; then
-      run npm install -g gh-axi@latest gnhf@latest
+      run npm install -g gh-axi@latest gnhf@latest lavish-axi@latest tasks-axi@latest
     fi
     if command -v treehouse >/dev/null 2>&1; then
       run treehouse update

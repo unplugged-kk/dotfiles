@@ -242,7 +242,7 @@ else
   echo "    herdr-file-viewer installed"
 fi
 
-echo "==> Step 8: gh-axi + gnhf (npm globals)"
+echo "==> Step 8: gh-axi + gnhf + lavish-axi + tasks-axi (npm globals)"
 set +u
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 set -u
@@ -255,6 +255,16 @@ if command -v gnhf >/dev/null 2>&1; then
   echo "    gnhf already installed, skipping"
 else
   npm install -g gnhf
+fi
+if command -v lavish-axi >/dev/null 2>&1; then
+  echo "    lavish-axi already installed, skipping"
+else
+  npm install -g lavish-axi
+fi
+if command -v tasks-axi >/dev/null 2>&1; then
+  echo "    tasks-axi already installed, skipping"
+else
+  npm install -g tasks-axi
 fi
 
 echo "==> Step 9: gh-axi session hooks (feeds GitHub context into every agent session)"
