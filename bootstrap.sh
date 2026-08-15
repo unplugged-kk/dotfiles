@@ -131,9 +131,29 @@ case "$PLATFORM" in
     # trusted - the trust flag is tap-level and only set by brew for official
     # taps or via attestations. If a future rebuild needs to re-enable update
     # checks for these taps, use HOMEBREW_AUTO_UPDATE_SECS or HOMEBREW_NO_ENV_HINTS.
+    # `nix run github:nix-darwin/...` re-resolves the branch ref via GitHub's
+    # API. As root (sudo) that call is unauthenticated and hits the 60/hr rate
+    # limit ("HTTP error 403"). Two defenses, in order:
+    #   1. Prefer the committed flake.lock (already pins nix-darwin's exact rev)
+    #      by building from the local flake - zero GitHub API calls.
+    #   2. If the lock is stale/missing, feed gh's token through NIX_CONFIG so
+    #      nix's github.com fetches authenticate even for the root subprocess
+    #      (same pattern rebuild.sh uses for `nix flake update`).
     NIX_BIN="$(command -v nix)"
-    sudo "$NIX_BIN" run github:nix-darwin/nix-darwin/nix-darwin-26.05#darwin-rebuild -- \
-      switch --flake ~/.dotfiles#mac
+    if [ -f "$DIR/flake.lock" ] && grep -q '"nix-darwin"' "$DIR/flake.lock"; then
+      sudo "$NIX_BIN" run "$DIR#darwinConfigurations.mac.system" -- \
+        switch --flake "$DIR#mac"
+    else
+      GH_TOKEN_VAL="$(gh auth token 2>/dev/null || true)"
+      if [ -n "$GH_TOKEN_VAL" ]; then
+        sudo env "NIX_CONFIG=access-tokens = github.com ${GH_TOKEN_VAL}" \
+          "$NIX_BIN" run github:nix-darwin/nix-darwin/nix-darwin-26.05#darwin-rebuild -- \
+          switch --flake "$DIR#mac"
+      else
+        sudo "$NIX_BIN" run github:nix-darwin/nix-darwin/nix-darwin-26.05#darwin-rebuild -- \
+          switch --flake "$DIR#mac"
+      fi
+    fi
     ;;
   Linux)
     echo "==> Step 5: first home-manager switch (standalone, no nix-darwin on Linux)"
