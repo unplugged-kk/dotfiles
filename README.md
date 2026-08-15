@@ -54,6 +54,16 @@ WezTerm, Ghostty, Warp, Cursor, VS Code, Claude Code, GitHub Copilot CLI, Lens, 
 | `headroom` | 59k | Token compression layer (20-95% fewer tokens) |
 | `code-review-graph` | 19.5k | PR-level structural review, ~82x token reduction |
 | `@dietrichgebert/ponytail` | 82.6k | Lazy senior dev mode (YAGNI, -54% code) |
+| `lavish-axi` | - | Lavish Editor: HTML artifact review (npm global) |
+| `tasks-axi` | - | Task management AXI (npm global) |
+| `chrome-devtools-axi` | - | Chrome DevTools AXI (npm global) |
+| `sqlite-axi` | - | SQLite operations AXI (npm global) |
+| `gws-axi` | - | Git worktree sessions AXI (npm global) |
+| `gitsheets-axi` | - | Git as spreadsheet AXI (npm global) |
+| `pg-axi` | - | PostgreSQL AXI (npm global) |
+| `cyber-mux` | - | Cross-multiplexer pane control (npm global) |
+| `docker-axi` | - | Docker operations AXI (npm global, GitHub source) |
+| `kubernetes-axi` | - | Kubernetes operations AXI (npm global, GitHub source) |
 | `cursor-agent` (`ca`) | - | Cursor CLI agent (https://cursor.com/cli) |
 | `pi` | - | Minimal coding agent harness (https://pi.dev/) |
 | `grok` (`gx`) | - | Grok Build / xAI CLI (https://x.ai/cli) |
@@ -199,6 +209,12 @@ Canonical hub: `~/.agents/skills/`. Bootstrap installs skill packs with the [Age
 | **emilkowalski/skills** | [emilkowalski/skills](https://github.com/emilkowalski/skills) | UI polish, animation review/audit, component design philosophy |
 | **ui-ux-pro-max** | [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | Styles/palettes/font-pairing/UX guideline database across 22 stacks |
 | **vercel-labs/skills** | [vercel-labs/skills](https://github.com/vercel-labs/skills) | find-skills: discover and install other skills |
+| **lavish** | [kunchenguid/lavish-axi](https://github.com/kunchenguid/lavish-axi) | HTML artifact review in a local editor |
+| **chrome-devtools-axi** | [kunchenguid/chrome-devtools-axi](https://github.com/kunchenguid/chrome-devtools-axi) | Browser automation (open/click/fill/screenshot) |
+| **sqlite-axi** | [SSBrouhard/sqlite-axi](https://github.com/SSBrouhard/sqlite-axi) | Read-only SQLite inspection/querying |
+| **tasks-axi** | [kunchenguid/tasks-axi](https://github.com/kunchenguid/tasks-axi) | Backlog/task management for agents |
+| **specops** | [JarvusInnovations/specops](https://github.com/JarvusInnovations/specops) | Spec-driven development: specs + plans micro-DAG + drift auditor |
+| **gitsheets** | [JarvusInnovations/gitsheets](https://github.com/JarvusInnovations/gitsheets) | Git-as-spreadsheet record editing |
 
 ```bash
 # Install / refresh (also done by bootstrap steps 13-14):
@@ -211,6 +227,12 @@ npx skills add tonbistudio/buzz-skills -g --all
 npx skills add emilkowalski/skills -g --all
 npx skills add nextlevelbuilder/ui-ux-pro-max-skill -g --all
 npx skills add vercel-labs/skills -g --all
+npx skills add kunchenguid/lavish-axi -g --skill lavish
+npx skills add kunchenguid/chrome-devtools-axi -g --skill chrome-devtools-axi
+npx skills add SSBrouhard/sqlite-axi -g --skill sqlite-axi
+npx skills add kunchenguid/tasks-axi -g --skill tasks-axi
+npx skills add JarvusInnovations/specops -g --skill specops
+npx skills add JarvusInnovations/gitsheets -g --skill gitsheets
 npx skills update -g
 
 # Examples
@@ -287,8 +309,8 @@ What bootstrap does (10 steps):
 | 5 | `darwin-rebuild switch` - applies all Nix config (5-20 min first time) |
 | 6 | Install nvm + Node.js LTS |
 | 7 | Install `no-mistakes` + `treehouse` to `~/.local/bin` |
-| 8 | Install `gh-axi` + `gnhf` as npm globals |
-| 9 | Set up `gh-axi` session hooks (feeds GitHub context into every agent session) |
+| 8 | Install agent CLI tools as npm globals: `gh-axi`, `gnhf`, `lavish-axi`, `tasks-axi`, `chrome-devtools-axi`, `sqlite-axi`, `gws-axi`, `gitsheets-axi`, `pg-axi`, `cyber-mux`, `docker-axi` + `kubernetes-axi` (GitHub) |
+| 9 | Set up agent session hooks: `gh-axi` (GitHub context) + `lavish-axi` (HTML artifact review) |
 | 10 | Clone `firstmate` to `~/git/personal/firstmate` |
 
 ### Step 5 - Open a new terminal
@@ -306,6 +328,15 @@ no-mistakes --version
 treehouse --version
 gh-axi --version
 gnhf --version
+lavish-axi --version
+chrome-devtools-axi --version
+sqlite-axi --version
+gws-axi --version
+gitsheets-axi --version
+pg-axi --version
+cyber-mux --version
+docker-axi --version
+kubernetes-axi --version
 ls ~/git/personal/firstmate/AGENTS.md
 ```
 
@@ -337,7 +368,7 @@ all `home.nix` packages, all agent tools) is shared with macOS. `bootstrap.sh` a
   `pkgs.<name>` in nixpkgs; tap-only formulae (coder, kimchi) install
   via direct GitHub release download in bootstrap
 - All agent tools (no-mistakes, treehouse, gh-axi, gnhf, firstmate,
-  headroom, code-review-graph, herdr-file-viewer)
+  headroom, code-review-graph, herdr-file-viewer, all AXI npm globals)
 - All `home.file.*` symlinks under `home/.config/*` and agent rules
 - zsh + autosuggestions + syntax highlighting, starship prompt,
   git + delta config, lazygit
@@ -377,7 +408,7 @@ What `bootstrap.sh` does on Linux (auto-detected, no flag needed):
 | 3 | Symlink repo to `~/.dotfiles` |
 | 4 | Detect `$(whoami)` and `$HOME`, offer to rewrite `flake.nix`'s `user` and `homeDirLinux` to match |
 | 5 | `home-manager switch --flake ~/.dotfiles#<username>` (standalone, no nix-darwin) |
-| 6-15 | Same as macOS: nvm + Node.js LTS, no-mistakes + treehouse, herdr-file-viewer, gh-axi + gnhf, firstmate, agent skills, code-review-graph |
+| 6-15 | Same as macOS: nvm + Node.js LTS, no-mistakes + treehouse, herdr-file-viewer, agent CLI tools (npm globals), firstmate, agent skills, code-review-graph |
 
 ### After bootstrap
 - Log out and back in (so the `docker` group membership takes effect), or run `newgrp docker` in the current shell.
@@ -749,6 +780,16 @@ Agent tools (installed to ~/.local/bin and npm globals):
   ~/.local/bin/grok                   Grok Build / xAI CLI (shell alias: gx)
   gh-axi                              GitHub CLI for agents (npm global)
   gnhf                                overnight agent runner (npm global)
+  lavish-axi                          Lavish Editor: HTML artifact review (npm global)
+  tasks-axi                           task management AXI (npm global)
+  chrome-devtools-axi                 Chrome DevTools AXI (npm global)
+  sqlite-axi                          SQLite operations AXI (npm global)
+  gws-axi                             git worktree sessions AXI (npm global)
+  gitsheets-axi                       Git-as-spreadsheet AXI (npm global)
+  pg-axi                              PostgreSQL AXI (npm global)
+  cyber-mux                           cross-multiplexer pane control (npm global)
+  docker-axi                          Docker operations AXI (npm global, GitHub source)
+  kubernetes-axi                      Kubernetes operations AXI (npm global, GitHub source)
   ~/git/personal/firstmate/           multi-agent crew distro (git clone)
 ```
 

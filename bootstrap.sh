@@ -242,33 +242,49 @@ else
   echo "    herdr-file-viewer installed"
 fi
 
-echo "==> Step 8: gh-axi + gnhf + lavish-axi + tasks-axi (npm globals)"
+echo "==> Step 8: agent CLI tools (npm globals)"
 set +u
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 set -u
-if command -v gh-axi >/dev/null 2>&1; then
-  echo "    gh-axi already installed, skipping"
-else
-  npm install -g gh-axi
-fi
-if command -v gnhf >/dev/null 2>&1; then
-  echo "    gnhf already installed, skipping"
-else
-  npm install -g gnhf
-fi
-if command -v lavish-axi >/dev/null 2>&1; then
-  echo "    lavish-axi already installed, skipping"
-else
-  npm install -g lavish-axi
-fi
-if command -v tasks-axi >/dev/null 2>&1; then
-  echo "    tasks-axi already installed, skipping"
-else
-  npm install -g tasks-axi
-fi
+# Standard npm-global agent CLIs. Loop keeps the install list declarative:
+# add a new AXI by appending its package name here (and to the same list in
+# home.nix's updateAgentCliTools + scripts/update-tools.sh).
+for pkg in \
+  gh-axi \
+  gnhf \
+  lavish-axi \
+  tasks-axi \
+  chrome-devtools-axi \
+  sqlite-axi \
+  gws-axi \
+  gitsheets-axi \
+  pg-axi \
+  cyber-mux \
+; do
+  if command -v "$pkg" >/dev/null 2>&1; then
+    echo "    $pkg already installed, skipping"
+  else
+    npm install -g "$pkg"
+  fi
+done
 
-echo "==> Step 9: gh-axi session hooks (feeds GitHub context into every agent session)"
+# docker-axi / kubernetes-axi: not yet published to npm - install straight from
+# GitHub so the `bin` entries land in npm's global prefix like the others.
+for pkg in docker-axi kubernetes-axi; do
+  if command -v "$pkg" >/dev/null 2>&1; then
+    echo "    $pkg already installed, skipping"
+  else
+    npm install -g "thatdudealso/$pkg"
+  fi
+done
+
+echo "==> Step 9: agent session hooks (gh-axi GitHub context, lavish-axi HTML artifact review)"
 gh-axi setup hooks 2>/dev/null || true
+# Lavish Editor - HTML artifact review. Hooks feed ambient context (open
+# sessions, playbooks) into Claude Code, Codex, OpenCode, Copilot CLI sessions.
+# The plugin registers the installed package with VS Code, Cursor, Copilot CLI.
+lavish-axi setup hooks 2>/dev/null || true
+lavish-axi setup plugin 2>/dev/null || true
 
 echo "==> Step 10: firstmate (multi-agent crew orchestrator)"
 FIRSTMATE_DIR="$HOME/git/personal/firstmate"
@@ -432,6 +448,38 @@ install_skill_pack "tonbistudio/buzz-skills" "buzz-media-attachments"
 install_skill_pack "emilkowalski/skills" "emil-design-eng"
 install_skill_pack "nextlevelbuilder/ui-ux-pro-max-skill" "ui-ux-pro-max"
 install_skill_pack "vercel-labs/skills" "find-skills"
+# Lavish Editor (lavish-axi) - HTML artifact review. Only the public `lavish`
+# skill; the repo's internal `lavish-design` brand skill stays hidden.
+if [ -d "$HOME/.agents/skills/lavish" ]; then
+  echo "    kunchenguid/lavish-axi already present (found lavish), skipping install"
+else
+  echo "    installing kunchenguid/lavish-axi (lavish skill) ..."
+  npx --yes skills add "kunchenguid/lavish-axi" -g --skill lavish 2>&1 | tail -15
+fi
+
+# AXI ecosystem skills - each AXI repo ships an installable Agent Skill that
+# teaches agents the CLI surface. Installed globally like the packs above.
+#   chrome-devtools-axi  - browser automation (skill: chrome-devtools-axi)
+#   sqlite-axi           - SQLite inspection (skill: sqlite-axi)
+#   tasks-axi            - backlog management (skill: tasks-axi)
+#   specops              - spec-driven development (whole repo is the skill)
+#   gitsheets            - git-as-spreadsheet (skill: gitsheets)
+# Note: gws-axi ships the same specops skill (not a gws-axi one) and cyber-mux
+# only ships an internal dev skill (mux-gap-scan), so neither is installed here.
+install_axi_skill() {
+  local repo="$1" marker_skill="$2" skill_name="$3"
+  if [ -d "$HOME/.agents/skills/$marker_skill" ]; then
+    echo "    $repo already present (found $marker_skill), skipping install"
+  else
+    echo "    installing $repo ($skill_name skill) ..."
+    npx --yes skills add "$repo" -g --skill "$skill_name" 2>&1 | tail -15
+  fi
+}
+install_axi_skill "kunchenguid/chrome-devtools-axi" "chrome-devtools-axi" "chrome-devtools-axi"
+install_axi_skill "SSBrouhard/sqlite-axi" "sqlite-axi" "sqlite-axi"
+install_axi_skill "kunchenguid/tasks-axi" "tasks-axi" "tasks-axi"
+install_axi_skill "JarvusInnovations/specops" "specops" "specops"
+install_axi_skill "JarvusInnovations/gitsheets" "gitsheets" "gitsheets"
 
 echo "==> Step 14: symlink ~/.agents/skills into every agent skill dir"
 # Agents that only scan their private skills/ folder still see the shared pack.
@@ -491,6 +539,15 @@ echo "      no-mistakes       $("$HOME/.local/bin/no-mistakes" --version 2>&1 | 
 echo "      treehouse         $("$HOME/.local/bin/treehouse" --version 2>&1)"
 echo "      gh-axi            $(gh-axi --version 2>/dev/null)"
 echo "      gnhf              $(gnhf --version 2>/dev/null)"
+echo "      lavish-axi        $(lavish-axi --version 2>/dev/null)"
+echo "      chrome-devtools-axi $(chrome-devtools-axi --version 2>/dev/null)"
+echo "      sqlite-axi        $(sqlite-axi --version 2>/dev/null)"
+echo "      gws-axi           $(gws-axi --version 2>/dev/null)"
+echo "      gitsheets-axi     $(gitsheets-axi --version 2>/dev/null)"
+echo "      pg-axi            $(pg-axi --version 2>/dev/null)"
+echo "      cyber-mux         $(cyber-mux --version 2>/dev/null)"
+echo "      docker-axi        $(docker-axi --version 2>/dev/null)"
+echo "      kubernetes-axi    $(kubernetes-axi --version 2>/dev/null)"
 echo "      headroom          $("$HOME/.local/bin/headroom" --version 2>/dev/null | head -1)"
 echo "      code-review-graph $("$HOME/.local/bin/code-review-graph" --version 2>&1 | head -1)"
 echo "      cursor-agent      $("$HOME/.local/bin/cursor-agent" --version 2>&1 | head -1)"
@@ -506,4 +563,4 @@ echo "      code-review-graph - PR structural review"
 echo "      claude-mem        - cross-session memory"
 echo ""
 echo "    Skills ($(ls "$HOME/.agents/skills/" 2>/dev/null | wc -l | tr -d ' ') in ~/.agents/skills, mirrored to Claude/Codex/Cursor/Grok/Pi/OpenCode/CommandCode/Gemini/Copilot):"
-echo "      mattpocock/skills (~41), addyosmani/agent-skills (~24), last30days, + other packs"
+echo "      mattpocock/skills (~41), addyosmani/agent-skills (~24), last30days, lavish, chrome-devtools-axi, sqlite-axi, tasks-axi, specops, gitsheets, + other packs"

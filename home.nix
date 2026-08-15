@@ -281,18 +281,25 @@ in
   home.file.".config/kimchi/harness/mcp.json".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.config/kimchi/harness/mcp.json";
 
-  # ── Agent CLI tooling (kunchenguid ecosystem) ──────────────────────────────
-  # gh-axi / gnhf / lavish-axi / tasks-axi are npm-global (installed under npm's
-  # configured prefix, ~/.local per `npm config get prefix`); treehouse /
-  # no-mistakes are Go binaries in ~/.local/bin with their own `update`
-  # subcommand. None of these are Nix-packaged, so home-manager can't pin/build
-  # them - this just makes sure every `./rebuild.sh` also brings them current,
-  # instead of them silently drifting stale between manual runs. Best-effort: a
-  # flaky network here must never fail the whole home-manager switch.
+  # ── Agent CLI tooling (AXI ecosystem) ─────────────────────────────────────
+  # gh-axi / gnhf / lavish-axi / tasks-axi / chrome-devtools-axi / sqlite-axi /
+  # gws-axi / gitsheets-axi / pg-axi / cyber-mux are npm-global (installed under
+  # npm's configured prefix, ~/.local per `npm config get prefix`); docker-axi /
+  # kubernetes-axi install from GitHub (not yet on npm); specops is a skill pack
+  # (installed by bootstrap Step 13, not an npm global); treehouse / no-mistakes
+  # are Go binaries in ~/.local/bin with their own `update` subcommand. None of
+  # these are Nix-packaged, so home-manager can't pin/build them - this just
+  # makes sure every `./rebuild.sh` also brings them current, instead of them
+  # silently drifting stale between manual runs. Best-effort: a flaky network
+  # here must never fail the whole home-manager switch.
   home.activation.updateAgentCliTools = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     run () { PATH="$HOME/.local/bin:$PATH" "$@" >/dev/null 2>&1 || true; }
     if command -v npm >/dev/null 2>&1; then
-      run npm install -g gh-axi@latest gnhf@latest lavish-axi@latest tasks-axi@latest
+      run npm install -g \
+        gh-axi@latest gnhf@latest lavish-axi@latest tasks-axi@latest \
+        chrome-devtools-axi@latest sqlite-axi@latest gws-axi@latest \
+        gitsheets-axi@latest pg-axi@latest cyber-mux@latest \
+        thatdudealso/docker-axi thatdudealso/kubernetes-axi
     fi
     if command -v treehouse >/dev/null 2>&1; then
       run treehouse update

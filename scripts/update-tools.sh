@@ -12,7 +12,10 @@
 #   pip tools               : headroom (headroom-ai + mcp SDK)
 #   uv tools                : code-review-graph
 #   npm globals             : gh-axi, gnhf, command-code, lavish-axi,
-#                             tasks-axi, ponytail, pi
+#                             tasks-axi, chrome-devtools-axi, sqlite-axi,
+#                             gws-axi, gitsheets-axi, pg-axi, cyber-mux,
+#                             ponytail, pi, agnix, cc-safety-net
+#   npm (github)            : docker-axi, kubernetes-axi
 #   curl installer          : grok
 #   herdr plugins           : browser, reviewr, memex, plus, vim-navigation
 #
@@ -140,6 +143,12 @@ if command -v npm >/dev/null 2>&1; then
     "command-code"
     "lavish-axi"
     "tasks-axi"
+    "chrome-devtools-axi"
+    "sqlite-axi"
+    "gws-axi"
+    "gitsheets-axi"
+    "pg-axi"
+    "cyber-mux"
     "@dietrichgebert/ponytail"
     "@earendil-works/pi-coding-agent"
     "agnix"
@@ -165,6 +174,17 @@ if command -v npm >/dev/null 2>&1; then
   else
     echo "    all npm globals up to date"
   fi
+  # docker-axi / kubernetes-axi: not on npm - install straight from GitHub.
+  # npm treats the github spec as a dependency; reinstalling keeps them current.
+  for gh_pkg in "thatdudealso/docker-axi" "thatdudealso/kubernetes-axi"; do
+    name="${gh_pkg##*/}"
+    if command -v "$name" >/dev/null 2>&1; then
+      echo "    updating $name (github)..."
+      npm install -g "$gh_pkg" 2>/dev/null || echo "    WARN: $name github update failed - keeping current"
+    else
+      echo "    $name not installed - skipping (bootstrap installs it)"
+    fi
+  done
 else
   echo "    npm not on PATH - skipping npm agent tools"
 fi
