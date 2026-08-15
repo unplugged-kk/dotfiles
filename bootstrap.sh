@@ -115,6 +115,14 @@ case "$PLATFORM" in
   Darwin)
     echo "==> Step 5: first darwin-rebuild switch (pinned to nix-darwin-26.05)"
 
+    # Third-party taps carrying casks (e.g. augani/dory) need an explicit
+    # `brew trust` before Homebrew will load them - otherwise `brew bundle`
+    # (run by nix-homebrew during activation) fails with "Refusing to load
+    # cask ... from untrusted tap". Trust is idempotent and persists in
+    # trust.json, so re-running this is a no-op once trusted. Mirrors the
+    # trust_taps() step in rebuild.sh.
+    brew trust --taps augani/dory >/dev/null 2>&1 || true
+
     # Tap-trust warnings ("Cannot check whether X is outdated because its tap
     # is not trusted") are suppressed at the source via HOMEBREW_NO_AUTO_UPDATE
     # in configuration.nix environment.sessionVariables. Disabling `brew update`
