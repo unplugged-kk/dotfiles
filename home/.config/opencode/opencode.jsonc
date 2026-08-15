@@ -4,64 +4,68 @@
   // ── Model ──────────────────────────────────────────────────────────────────
   "model": "claude-sonnet-4-5",
 
-  // ── MCP servers ────────────────────────────────────────────────────────────
+  // ── MCP servers (V2: mcp.servers) ─────────────────────────────────────────
   // All commands use absolute paths because MCP child processes may spawn before
-  // home-manager session PATH is loaded. See home.nix:69 home.sessionPath.
+  // home-manager session PATH is loaded. See home.nix home.sessionPath.
   "mcp": {
-    // Code intelligence - per-project (run `codegraph init` in a project to enable)
-    "codegraph": {
-      "type": "local",
-      "command": ["/Users/kishore/.local/bin/codegraph", "serve", "--mcp"],
-      "enabled": true
-    },
+    "servers": {
+      // Code intelligence - per-project (run `codegraph init` in a project to enable)
+      "codegraph": {
+        "type": "local",
+        "command": ["/Users/kishore/.local/bin/codegraph", "serve", "--mcp"]
+      },
 
-    // Token compression - 20-95% fewer tokens, same answers
-    "headroom": {
-      "type": "local",
-      "command": ["/Users/kishore/.local/bin/headroom", "mcp", "serve"],
-      "enabled": true
-    },
+      // Token compression - 20-95% fewer tokens, same answers
+      "headroom": {
+        "type": "local",
+        "command": ["/Users/kishore/.local/bin/headroom", "mcp", "serve"]
+      },
 
-    // Code review graph - PR-level structural review (https://github.com/tirth8205/code-review-graph)
-    // Installed via pipx in bootstrap.sh step 15; binary lands in ~/.local/bin
-    "code-review-graph": {
-      "type": "local",
-      "command": ["/Users/kishore/.local/bin/code-review-graph", "serve"],
-      "enabled": true
-    },
+      // Code review graph - PR-level structural review (https://github.com/tirth8205/code-review-graph)
+      // Installed via pipx in bootstrap.sh step 15; binary lands in ~/.local/bin
+      "code-review-graph": {
+        "type": "local",
+        "command": ["/Users/kishore/.local/bin/code-review-graph", "serve"]
+      },
 
-    // Cross-session memory - persists knowledge across agent sessions
-    // Use absolute path to nvm node - MCP child processes don't inherit nvm PATH
-    "claude-mem": {
-      "type": "local",
-      "command": ["/Users/kishore/.nvm/versions/node/v24.18.0/bin/node", "/Users/kishore/.claude/plugins/marketplaces/thedotmack/plugin/scripts/mcp-server.cjs"],
-      "enabled": true
-    },
+      // Cross-session memory - persists knowledge across agent sessions
+      // Use absolute path to nvm node - MCP child processes don't inherit nvm PATH
+      "claude-mem": {
+        "type": "local",
+        "command": [
+          "/Users/kishore/.nvm/versions/node/v24.18.0/bin/node",
+          "/Users/kishore/.claude/plugins/marketplaces/thedotmack/plugin/scripts/mcp-server.cjs"
+        ]
+      },
 
-    // Obsidian vault access (requires Obsidian Local REST API plugin running)
-    // API key stored in ~/.claude/settings.local.json - do NOT commit
-    "obsidian": {
-      "type": "local",
-      "command": ["npx", "-y", "mcp-obsidian"],
-      "enabled": false,
-      "_note": "Set OBSIDIAN_API_KEY and OBSIDIAN_HOST env vars in settings.local.json before enabling"
+      // Obsidian vault access (requires Obsidian Local REST API plugin running)
+      // API key stored in ~/.claude/settings.local.json - do NOT commit
+      // Disabled: set OBSIDIAN_API_KEY and OBSIDIAN_HOST env vars before enabling
+      "obsidian": {
+        "type": "local",
+        "command": ["npx", "-y", "mcp-obsidian"],
+        "disabled": true
+      }
     }
   },
 
-  // ── Plugins ────────────────────────────────────────────────────────────────
-  // ponytail: lazy senior dev mode - YAGNI, minimal code, no over-engineering
-  "plugin": [
+  // ── Plugins (V2: plugins) ─────────────────────────────────────────────────
+  // ponytail: lazy senior dev mode - YAGNI, minimal code, no over-engineering.
+  // NOTE: this is a V1-format plugin. opencode2 needs it ported to the V2
+  // plugin API (https://opencode.ai/v2/docs/migrate-v1#plugins) before its
+  // hooks fire; the entry below keeps the reference until then.
+  "plugins": [
     "/Users/kishore/.local/lib/node_modules/@dietrichgebert/ponytail/.opencode/plugins/ponytail.mjs"
   ],
 
-  // ── Permissions (singular "permission" - per-tool allow/ask/deny) ─────────
-  // OpenCode allows everything by default. We only restrict destructive bash.
-  // MCP tools are auto-allowed when their server is enabled (no entry needed).
-  "permission": {
-    "edit": "allow",
-    "bash": "allow",
-    "webfetch": "allow",
-    "rm -rf *": "deny",
-    "sudo *": "ask"
-  }
+  // ── Permissions (V2: ordered rules array, last match wins) ────────────────
+  // OpenCode allows almost everything by default. We only restrict destructive
+  // bash. Broad allows first, specific exceptions last.
+  "permissions": [
+    { "action": "edit", "resource": "*", "effect": "allow" },
+    { "action": "shell", "resource": "*", "effect": "allow" },
+    { "action": "webfetch", "resource": "*", "effect": "allow" },
+    { "action": "shell", "resource": "rm -rf *", "effect": "deny" },
+    { "action": "shell", "resource": "sudo *", "effect": "ask" }
+  ]
 }

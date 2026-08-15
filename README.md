@@ -71,7 +71,7 @@ WezTerm, Ghostty, Warp, Cursor, VS Code, Claude Code, GitHub Copilot CLI, Lens, 
 
 | Agent CLI | Config file | Format |
 |-----------|-------------|--------|
-| OpenCode (`oc`) | `home/.config/opencode/opencode.jsonc` | `{ "mcp": { "name": { "type": "local"\|"remote", ... } } }` |
+| OpenCode (`oc` / `oc2`) | `home/.config/opencode/opencode.jsonc` | V2: `{ "mcp": { "servers": { "name": { "type": "local"\|"remote", ... } } }, "permissions": [...] }` |
 | Claude Code (`cc`) | `home/.claude/settings.json` | `{ "mcpServers": { "name": { "command"\|"type", ... } } }` |
 | Kimchi | `home/.config/kimchi/harness/mcp.json` | `{ "mcpServers": { "name": { "command", "args", "env" } } }` |
 | Command Code (`cmd`) | `home/.commandcode/mcp.json` | `{ "mcpServers": { "name": { "command"\|"url", ... } } }` |
@@ -675,6 +675,7 @@ nvim
 | `cc` | `claude --dangerously-skip-permissions` | agents |
 | `co` | `codex --full-auto` | agents |
 | `oc` | `opencode` | agents |
+| `oc2` | `opencode2` (V2 beta) | agents |
 | `ca` | `cursor-agent` | agents |
 | `pi` | Pi coding agent (npm global, no alias) | agents |
 | `gx` | `grok` (xAI / Grok Build CLI) | agents |
@@ -738,7 +739,7 @@ home/
     nvim/                             lazy.nvim, rose-pine moon, oil, snacks, neogit
     herdr/config.toml                 agent multiplexer: vim keys, Ctrl+b
     treehouse/config.toml             worktree pool: max 16 trees
-    opencode/opencode.jsonc           model, codegraph MCP, thinking on
+    opencode/opencode.jsonc           OpenCode 2 native: model, MCP servers, permissions, plugins
 
 Agent tools (installed to ~/.local/bin and npm globals):
   ~/.local/bin/no-mistakes            AI-gated PR pipeline (Go)

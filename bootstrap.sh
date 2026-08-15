@@ -305,6 +305,18 @@ if [ -x "$HOME/.opencode/bin/opencode" ]; then
   echo "    opencode symlink: $HOME/.local/bin/opencode -> $HOME/.opencode/bin/opencode"
 fi
 
+# OpenCode 2 (https://opencode.ai/v2/docs/migrate-v1) - the V2 beta, installed
+# from the `next` npm tag as `opencode2` so it coexists with V1's `opencode`.
+# Both read the same ~/.config/opencode/ config (symlinked via home.nix). npm
+# prefix is ~/.local, so the binary lands in ~/.local/bin/opencode2. Shell
+# alias: oc2.
+if command -v opencode2 >/dev/null 2>&1; then
+  echo "    opencode2 already installed: $(opencode2 --version 2>&1 | head -1)"
+else
+  npm install -g @opencode-ai/cli@next
+  echo "    opencode2 installed: $(opencode2 --version 2>&1 | head -1)"
+fi
+
 # Cursor CLI (https://cursor.com/docs/cli/overview) - install via official
 # installer. Prefer the unambiguous binary name `cursor-agent` (also installs
 # `agent`, which collides with Grok's `~/.local/bin/agent` symlink). MCP config

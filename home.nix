@@ -182,6 +182,8 @@ in
       # Absolute paths so aliases work even when PATH is incomplete or aliases
       # are skipped. Bootstrap also installs shims under ~/.local/bin (ca, gx, oc).
       oc = "${homeDir}/.opencode/bin/opencode";
+      # OpenCode 2 beta (npm-global in ~/.local/bin, on sessionPath)
+      oc2 = "opencode2";
       # Cursor CLI - prefer cursor-agent over `agent` (Grok owns that name)
       ca = "${homeDir}/.local/bin/cursor-agent";
       # Grok Build / xAI CLI (https://x.ai/cli)
