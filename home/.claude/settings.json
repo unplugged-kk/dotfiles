@@ -77,7 +77,8 @@
     "claude-mem@thedotmack": true,
     "gopls-lsp@claude-plugins-official": true,
     "warp@claude-code-warp": true,
-    "mattpocock-skills@claude-plugins-official": true
+    "mattpocock-skills@claude-plugins-official": true,
+    "ponytail@ponytail": true
   },
   "extraKnownMarketplaces": {
     "caveman": {
@@ -96,6 +97,12 @@
       "source": {
         "source": "github",
         "repo": "thedotmack/claude-mem"
+      }
+    },
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
       }
     }
   },

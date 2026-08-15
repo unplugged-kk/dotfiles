@@ -56,6 +56,9 @@ in
     # editor
     neovim
 
+    # terminal multiplexer
+    zellij      # pluggable terminal workspace (zj)
+
     # javascript runtime - required by the claude-mem plugin's auto-install
     # hook (scripts/version-check.js runs `bun install --production` to
     # materialize its node_modules). also needed for any npx-based tooling.
@@ -186,6 +189,9 @@ in
 
       # parallel agent worktrees (treehouse)
       th = "treehouse";
+
+      # zellij terminal multiplexer
+      zj = "zellij";
 
       # overnight agent runner
       # usage: gnhf "your objective" or gnhf --worktree "task1" & gnhf --worktree "task2" &

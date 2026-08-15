@@ -52,3 +52,7 @@ args = [
   "/Users/kishore/.claude/plugins/marketplaces/thedotmack/plugin/scripts/mcp-server.cjs",
 ]
 enabled = true
+
+# ponytail plugin - lazy senior dev mode (https://github.com/DietrichGebert/ponytail)
+[plugins]
+enabled = ["ponytail"]
