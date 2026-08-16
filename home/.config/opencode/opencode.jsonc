@@ -59,4 +59,10 @@
     { "action": "shell", "resource": "rm -rf *", "effect": "deny" },
     { "action": "shell", "resource": "sudo *", "effect": "ask" }
   ]
+
+  // ── Skills (slash commands) ──────────────────────────────────────────────
+  // opencode2 natively registers skills from ~/.config/opencode/skills
+  // (symlinked to ~/.agents/skills by scripts/sync-skills.sh) and surfaces
+  // them as /<skill-id> commands plus a /skills browse menu. No generated
+  // "commands" block needed - do not re-add gen-opencode-commands.mjs.
 }
