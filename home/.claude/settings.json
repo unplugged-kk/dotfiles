@@ -26,7 +26,11 @@
       "mcp__codegraph__*",
       "mcp__headroom__*",
       "mcp__code-review-graph__*",
-      "mcp__claude-mem__*"
+      "mcp__claude-mem__*",
+      "Bash(graft:*)",
+      "Bash(npx graft:*)",
+      "Bash(graft-dev:*)",
+      "Bash(node dist/cli.js:*)"
     ],
     "defaultMode": "acceptEdits"
   },
@@ -40,6 +44,26 @@
             "type": "command",
             "command": "code-review-graph update",
             "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/helpers/graft-hooks.cjs\" post-edit",
+            "timeout": 10000
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|mcp__graft__",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/helpers/graft-hooks.cjs\" tool-savings",
+            "timeout": 8000
           }
         ]
       }
@@ -64,12 +88,43 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/helpers/graft-hooks.cjs\" session-start",
+            "timeout": 8000
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/helpers/graft-hooks.cjs\" prompt",
+            "timeout": 15000
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/helpers/graft-hooks.cjs\" stop",
+            "timeout": 8000
+          }
+        ]
       }
     ]
   },
   "statusLine": {
     "type": "command",
-    "command": "input=$(cat); model=$(echo \"$input\" | jq -r '.model.display_name'); used=$(echo \"$input\" | jq -r '.context_window.used_percentage // empty'); size=$(echo \"$input\" | jq -r '.context_window.context_window_size // empty'); five=$(echo \"$input\" | jq -r '.rate_limits.five_hour.used_percentage // empty'); week=$(echo \"$input\" | jq -r '.rate_limits.seven_day.used_percentage // empty'); out=\"$model\"; if [ -n \"$used\" ]; then out=\"$out | ctx: $(printf '%.0f' \"$used\")%\"; [ -n \"$size\" ] && out=\"$out of $(printf '%dk' $((size/1000)))\"; fi; [ -n \"$five\" ] && out=\"$out | 5h: $(printf '%.0f' \"$five\")%\"; [ -n \"$week\" ] && out=\"$out | 7d: $(printf '%.0f' \"$week\")%\"; printf \"%s\" \"$out\""
+    "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/helpers/graft-statusline.cjs\""
   },
   "enabledPlugins": {
     "caveman@caveman": true,
@@ -141,5 +196,12 @@
       ],
       "command": "/Users/kishore/.local/bin/headroom"
     }
-  }
+  },
+  "subagentStatusLine": {
+    "type": "command",
+    "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/helpers/graft-statusline.cjs\""
+  },
+  "footerLinksRegexes": [
+    "graft/[\\w./-]+\\.md"
+  ]
 }

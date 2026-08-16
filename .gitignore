@@ -29,3 +29,7 @@ home/.claude/settings.local.json
 .env
 .env.*
 !.env.example
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+# Root-anchored so nested skill dirs (e.g. .claude/skills/graft/) still commit.
+/graft/
