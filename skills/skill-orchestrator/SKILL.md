@@ -91,6 +91,75 @@ Read the relevant skill definitions before recommending them. Do not recommend
 a skill solely based on its name. Understand what the skill actually does, its
 inputs, outputs, limitations, and dependencies.
 
+## Phase 3b — Know Your Installed Skill Catalog
+
+The system has a large, always-available skill set. The canonical hub is
+`~/.agents/skills/` and every CLI agent (Claude Code, OpenCode, Cursor, Codex,
+Grok, Pi, Command Code, Gemini, Copilot, Kiro, Windsurf, AdaL, Hermes) mirrors
+it. Source of truth, in priority order:
+
+1. **Repo-local skills** (`~/.dotfiles/skills/`): `skill-orchestrator` (this
+   skill), plus anything else authored in this dotfiles repo.
+2. **mattpocock/skills** (~35): grill-me, grilling, wayfinder, implement,
+   to-spec, to-tickets, to-prd, tdd, domain-modeling, code-review, code-review-and-quality,
+   diagnosing-bugs, debugging-and-error-recovery, incremental-implementation,
+   interview-me, spec-driven-development, setup-matt-pocock-skills, handoff,
+   claude-handoff, task-orbiting, questions-first, ask-matt, code-simplification,
+   codebase-design, design-an-interface, improve-codebase-architecture,
+   deprecated-and-migration planning, documenting-decisions, etc.
+3. **davidondrej/skills** (~48): distribute-skill-to-all-agents, deep-research,
+   codex-subagent, git-worktree, goal-loop, handoff, teach, prod-push,
+   read-prod-database, create-readonly-db-role, effective-agent-skills,
+   folder-specific-claude-and-agents-md, askThenBuild pattern (build-prompt flow),
+   before-building, decisions, level-up, next-decision, prompt-me, read-all-adrs,
+   remind, short, stop-overthinking, etc.
+4. **superpowers** (obra/superpowers, ~14): systematic-debugging,
+   test-driven-development, writing-plans, subagent-driven-development,
+   brainstorming, executing-plans, requesting-code-review, receiving-code-review,
+   verification-before-completion, writing-skills, using-git-worktrees, etc.
+5. **anthropics/skills** (~17): web-artifacts-builder, brand-guidelines,
+   canvas-design, pdf, docx, xlsx, pptx, slack-gif-creator, frontend-design,
+   skill-creator, mcp-builder, claude-api, webapp-testing, algorithmic-art, etc.
+6. **gstack** (garrytan/gstack, ~54): ship, review, qa, office-hours,
+   design-review, plan-* review skills, ios-fix/clean/sync/qa, context-save,
+   context-restore, spec, investigate, health, gstack-upgrade, make-pdf, etc.
+7. **addyosmani/agent-skills** (~24): spec-driven-development,
+   planning-and-task-breakdown, test-driven-development, security-and-hardening,
+   shipping-and-launch, using-agent-skills, debugging-and-error-recovery,
+   observability-and-instrumentation, code-review, api-and-interface-design,
+   documentation-and-adrs, deprecation-and-migration, git-workflow-and-versioning,
+   performance-optimization, ci-cd-and-automation, domain-modeling,
+   ubiquity-language, decision-mapping, etc.
+8. **ui-ux-pro-max** (nextlevelbuilder): 84 styles, 192 palettes, 74 font
+   pairings, 98 UX guidelines, 104 icons, 16 GSAP presets, 25 chart types.
+9. **ai-agents-skills** (hoodini, ~39): analytics, aws, cloudflare, copilot
+   skills, director, fal-ai, figma, github-trending, mongodb, owasp-security,
+   railway, vercel, video, web-accessibility, design systems, mobile
+   responsiveness, etc.
+10. **ai-toolkit** (c0x12c, ~35): backend-api-design, testing-strategies,
+    security-checklist, terraform-*, database-*, market-research, deep-research,
+    design-workflow, brainstorm, startup-pipeline, content-engine, etc.
+11. **Specialized single-skill packs**: last30days (cross-platform research),
+    humanizer (strip AI-writing tells), lavish (HTML artifact review),
+    chrome-devtools-axi (browser automation), sqlite-axi (read-only SQLite),
+    tasks-axi (backlog management), specops (spec-driven dev + plans micro-DAG),
+    gitsheets (git-backed record store), terraform-skill (authoritative OpenTofu),
+    improve (shadcn, code-quality), find-skills (vercel-labs skill discovery).
+12. **Buzz/design misc**: buzz-skills, ai-design-skills, emilkowalski/skills.
+
+You can enumerate the live catalog at any time (prefer this to trusting the
+list above, which is a snapshot):
+
+```bash
+ls ~/.agents/skills/
+# or with a one-line description:
+for d in ~/.agents/skills/*/; do echo "- $d"; done
+```
+
+Rule: when the user's task maps to a skill here, name that skill and read its
+`SKILL.md` before recommending it. Do not invent skills that are not in the
+catalog; if a capability is missing, report it as a gap (Phase 9).
+
 ## Phase 4 — Build a Skill-to-Task Matrix
 
 For every meaningful piece of work, determine the best skill. Use a structure

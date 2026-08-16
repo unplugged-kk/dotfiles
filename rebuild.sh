@@ -49,6 +49,7 @@ Default: rebuild the system with the current flake.lock (fast, no upgrades).
     4. brew upgrade             - bump brew packages that have newer versions
     5. nix profile upgrade '.*'  - bump user-profile packages (none currently)
     6. scripts/update-tools.sh  - bump agent tools (npm globals, binaries, plugins)
+    7. scripts/sync-skills.sh  - refresh upstream skill repos + rewire agents
 
   Each step is skipped automatically if there's nothing to do.
 
@@ -145,6 +146,14 @@ if [ -x "$DIR/scripts/update-tools.sh" ]; then
   "$DIR/scripts/update-tools.sh" || echo "    (agent tools update failed - continuing)"
 else
   echo "    scripts/update-tools.sh missing - skipping"
+fi
+echo ""
+
+echo "==> 7/7: skill repos sync (upstream repos + wiring to every agent)"
+if [ -x "$DIR/scripts/sync-skills.sh" ]; then
+  "$DIR/scripts/sync-skills.sh" || echo "    (skill sync failed - continuing)"
+else
+  echo "    scripts/sync-skills.sh missing - skipping"
 fi
 echo ""
 

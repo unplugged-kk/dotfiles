@@ -510,28 +510,14 @@ install_axi_skill "kunchenguid/tasks-axi" "tasks-axi" "tasks-axi"
 install_axi_skill "JarvusInnovations/specops" "specops" "specops"
 install_axi_skill "JarvusInnovations/gitsheets" "gitsheets" "gitsheets"
 
-echo "==> Step 14: symlink ~/.agents/skills into every agent skill dir"
-# Agents that only scan their private skills/ folder still see the shared pack.
-AGENT_SKILL_DIRS=(
-  "$HOME/.claude/skills"
-  "$HOME/.codex/skills"
-  "$HOME/.cursor/skills"
-  "$HOME/.grok/skills"
-  "$HOME/.pi/agent/skills"
-  "$HOME/.opencode/skills"
-  "$HOME/.commandcode/skills"
-  "$HOME/.gemini/skills"
-  "$HOME/.copilot/skills"
-)
-for dest_parent in "${AGENT_SKILL_DIRS[@]}"; do
-  mkdir -p "$dest_parent"
-  for skill_dir in "$HOME/.agents/skills/"*/; do
-    [ -d "$skill_dir" ] || continue
-    skill_name=$(basename "$skill_dir")
-    ln -sfn "$skill_dir" "$dest_parent/$skill_name"
-  done
-  echo "    $dest_parent: $(ls -1 "$dest_parent" 2>/dev/null | wc -l | tr -d ' ') skills"
-done
+echo "==> Step 14: sync upstream skill repos + wire canonical skills to every agent"
+# scripts/sync-skills.sh clones the upstream skill repos (mattpocock/skills,
+# davidondrej/skills, obra/superpowers, anthropics/skills, garrytan/gstack,
+# ui-ux-pro-max, addyosmani/agent-skills, ai-agents-skills, ai-toolkit,
+# shadcn/improve, terraform-skill) into ~/.agents/skills, then wires every
+# agent's skill dir to it (Claude/Codex/Cursor/Grok/Pi/OpenCode/CommandCode/
+# Gemini/Copilot/Kiro/Windsurf/AdaL/Hermes). Idempotent - safe to re-run.
+bash "$DIR/scripts/sync-skills.sh"
 
 # Grok native plugin for last30days (marketplace source in home/.grok/config.toml)
 if command -v grok >/dev/null 2>&1; then

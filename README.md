@@ -193,22 +193,35 @@ Copilot CLI manages MCP servers interactively via the `/mcp` slash command insid
 
 After adding, run `/mcp` again to confirm servers show "connected" status.
 
-### Skills (~96 in the shared hub, mirrored to all agents)
+### Skills (~230 in the shared hub, mirrored to all agents)
 
-Canonical hub: `~/.agents/skills/`. Bootstrap installs skill packs with the [Agent Skills](https://agentskills.io) CLI, then **symlinks every skill** into:
+Canonical hub: `~/.agents/skills/`. `scripts/sync-skills.sh` shallow-clones the
+upstream skill repos into `~/.agents/skill-repos/`, syncs every `SKILL.md` into
+the hub, and **symlinks every skill** into:
 
-`~/.claude/skills`, `~/.codex/skills`, `~/.cursor/skills`, `~/.grok/skills`, `~/.pi/agent/skills`, `~/.opencode/skills`, `~/.commandcode/skills`, `~/.gemini/skills`, `~/.copilot/skills`
+`~/.claude/skills`, `~/.codex/skills`, `~/.cursor/skills`, `~/.grok/skills`, `~/.pi/agent/skills`, `~/.config/opencode/skills`, `~/.opencode/skills`, `~/.commandcode/skills`, `~/.gemini/skills`, `~/.copilot/skills`, `~/.hermes/skills`, `~/.kiro/skills`, `~/.windsurf/skills`, `~/.adal/skills`
+
+`sync-skills.sh` runs during bootstrap (step 14) and `rebuild --upgrade` (step 7).
+Some packs are still added through the [Agent Skills](https://agentskills.io) CLI
+(`npx skills add ... -g`) which registers them on every supported host.
 
 | Pack | Source | What you get |
 |------|--------|--------------|
-| **mattpocock/skills** | [mattpocock/skills](https://github.com/mattpocock/skills) | ~41 skills: grill-me, wayfinder, implement, to-spec, to-tickets, tdd, domain-modeling, code-review, handoff, ... |
+| **mattpocock/skills** | [mattpocock/skills](https://github.com/mattpocock/skills) | ~35 skills: grill-me, wayfinder, implement, to-spec, to-tickets, tdd, domain-modeling, code-review, handoff, ... |
+| **davidondrej/skills** | [davidondrej/skills](https://github.com/davidondrej/skills) | ~48 skills: distribute-skill-to-all-agents, handoff, deep-research, codex-subagent, git-worktree, prod-push, read-prod-database, ... |
+| **superpowers** | [obra/superpowers](https://github.com/obra/superpowers) | ~14 skills: systematic-debugging, test-driven-development, writing-plans, subagent-driven-development, brainstorming, ... |
+| **anthropics/skills** | [anthropics/skills](https://github.com/anthropics/skills) | ~17 skills: web-artifacts-builder, brand-guidelines, canvas-design, pdf, mcp-builder, skill-creator, ... |
+| **gstack** | [garrytan/gstack](https://github.com/garrytan/gstack) | ~54 skills: ship, review, qa, office-hours, design-review, ios-fix, context-save, gstack-upgrade, ... |
+| **ui-ux-pro-max** | [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | Styles/palettes/font-pairing/UX guideline database across 22 stacks |
 | **addyosmani/agent-skills** | [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) | ~24 production skills: spec-driven-development, planning-and-task-breakdown, security-and-hardening, shipping-and-launch, using-agent-skills, ... |
+| **ai-agents-skills** | [hoodini/ai-agents-skills](https://github.com/hoodini/ai-agents-skills) | ~39 skills: fal-ai, deep-research, mobile-responsiveness, vercel, cloudflare, mongodb, ... |
+| **ai-toolkit** | [c0x12c/ai-toolkit](https://github.com/c0x12c/ai-toolkit) | ~35 skills: backend-api-design, testing-strategies, terraform, database-patterns, design-workflow, startup-pipeline, market-research, ... |
+| **awesome-agent-skills** | [VoltAgent/awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) | Curated index of 1497+ skills from other repos - discovery catalog only (ships 0 SKILL.md), pair with find-skills / agent-reach |
 | **last30days** | [kishoreHQ/last30days-skill](https://github.com/kishoreHQ/last30days-skill) | Research any topic across Reddit, X, YouTube, HN, Polymarket, GitHub, web |
 | **humanizer** | [blader/humanizer](https://github.com/blader/humanizer) | Strip AI-writing tells (em dashes, rule-of-three, filler) from text |
 | **ai-design-skills** | [elayadesign/ai-design-skills](https://github.com/elayadesign/ai-design-skills) | Landing pages, design systems, slides, UI styling |
 | **buzz-skills** | [tonbistudio/buzz-skills](https://github.com/tonbistudio/buzz-skills) | Buzz chat media attachments, self-hosting, Hermes integration |
 | **emilkowalski/skills** | [emilkowalski/skills](https://github.com/emilkowalski/skills) | UI polish, animation review/audit, component design philosophy |
-| **ui-ux-pro-max** | [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | Styles/palettes/font-pairing/UX guideline database across 22 stacks |
 | **vercel-labs/skills** | [vercel-labs/skills](https://github.com/vercel-labs/skills) | find-skills: discover and install other skills |
 | **lavish** | [kunchenguid/lavish-axi](https://github.com/kunchenguid/lavish-axi) | HTML artifact review in a local editor |
 | **chrome-devtools-axi** | [kunchenguid/chrome-devtools-axi](https://github.com/kunchenguid/chrome-devtools-axi) | Browser automation (open/click/fill/screenshot) |
@@ -216,24 +229,20 @@ Canonical hub: `~/.agents/skills/`. Bootstrap installs skill packs with the [Age
 | **tasks-axi** | [kunchenguid/tasks-axi](https://github.com/kunchenguid/tasks-axi) | Backlog/task management for agents |
 | **specops** | [JarvusInnovations/specops](https://github.com/JarvusInnovations/specops) | Spec-driven development: specs + plans micro-DAG + drift auditor |
 | **gitsheets** | [JarvusInnovations/gitsheets](https://github.com/JarvusInnovations/gitsheets) | Git-as-spreadsheet record editing |
+| **terraform-skill** | [antonbabenko/terraform-skill](https://github.com/antonbabenko/terraform-skill) | Authoritative Terraform/OpenTofu best-practices skill |
+| **improve** | [shadcn/improve](https://github.com/shadcn/improve) | Improve AI-generated code quality against human-written standards |
 
 ```bash
-# Install / refresh (also done by bootstrap steps 13-14):
-npx skills add mattpocock/skills -g --all
-npx skills add addyosmani/agent-skills -g --all
-npx skills add kishoreHQ/last30days-skill -g --all
-npx skills add blader/humanizer -g --all
-npx skills add elayadesign/ai-design-skills -g --all
-npx skills add tonbistudio/buzz-skills -g --all
-npx skills add emilkowalski/skills -g --all
-npx skills add nextlevelbuilder/ui-ux-pro-max-skill -g --all
-npx skills add vercel-labs/skills -g --all
-npx skills add kunchenguid/lavish-axi -g --skill lavish
-npx skills add kunchenguid/chrome-devtools-axi -g --skill chrome-devtools-axi
-npx skills add SSBrouhard/sqlite-axi -g --skill sqlite-axi
-npx skills add kunchenguid/tasks-axi -g --skill tasks-axi
-npx skills add JarvusInnovations/specops -g --skill specops
-npx skills add JarvusInnovations/gitsheets -g --skill gitsheets
+# Refresh upstream repos + rewire all agents (also run by bootstrap step 14 and
+# rebuild --upgrade step 7). Idempotent - safe to run any time:
+./scripts/sync-skills.sh
+
+# Explicit modes
+./scripts/sync-skills.sh --repos   # only pull upstream repos
+./scripts/sync-skills.sh --local   # only sync hub -> agent dirs
+
+# Legacy: install a pack through the Agent Skills CLI (registers hosts too).
+npx skills add <owner/repo> -g --all
 npx skills update -g
 
 # Examples
