@@ -288,6 +288,7 @@ for pkg in \
   gitsheets-axi \
   pg-axi \
   cyber-mux \
+  graft \
 ; do
   if command -v "$pkg" >/dev/null 2>&1; then
     echo "    $pkg already installed, skipping"
@@ -576,6 +577,7 @@ echo "      pg-axi            $(pg-axi --version 2>/dev/null)"
 echo "      cyber-mux         $(cyber-mux --version 2>/dev/null)"
 echo "      docker-axi        $(docker-axi --version 2>/dev/null)"
 echo "      kubernetes-axi    $(kubernetes-axi --version 2>/dev/null)"
+echo "      graft             $(graft --version 2>/dev/null)"
 echo "      headroom          $("$HOME/.local/bin/headroom" --version 2>/dev/null | head -1)"
 echo "      code-review-graph $("$HOME/.local/bin/code-review-graph" --version 2>&1 | head -1)"
 echo "      cursor-agent      $("$HOME/.local/bin/cursor-agent" --version 2>&1 | head -1)"

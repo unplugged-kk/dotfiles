@@ -14,7 +14,7 @@
 #   npm globals             : gh-axi, gnhf, command-code, lavish-axi,
 #                             tasks-axi, chrome-devtools-axi, sqlite-axi,
 #                             gws-axi, gitsheets-axi, pg-axi, cyber-mux,
-#                             ponytail, pi, agnix, cc-safety-net
+#                             graft, ponytail, pi, agnix, cc-safety-net
 #   npm (github)            : docker-axi, kubernetes-axi
 #   curl installer          : grok
 #   herdr plugins           : browser, reviewr, memex, plus, vim-navigation
@@ -149,6 +149,7 @@ if command -v npm >/dev/null 2>&1; then
     "gitsheets-axi"
     "pg-axi"
     "cyber-mux"
+    "graft"
     "@dietrichgebert/ponytail"
     "@earendil-works/pi-coding-agent"
     "agnix"

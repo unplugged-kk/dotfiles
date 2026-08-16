@@ -64,6 +64,7 @@ WezTerm, Ghostty, Warp, Cursor, VS Code, Claude Code, GitHub Copilot CLI, Lens, 
 | `cyber-mux` | - | Cross-multiplexer pane control (npm global) |
 | `docker-axi` | - | Docker operations AXI (npm global, GitHub source) |
 | `kubernetes-axi` | - | Kubernetes operations AXI (npm global, GitHub source) |
+| `graft` | - | Context graph for agents: faster/cheaper codebase understanding (npm global) |
 | `cursor-agent` (`ca`) | - | Cursor CLI agent (https://cursor.com/cli) |
 | `pi` | - | Minimal coding agent harness (https://pi.dev/) |
 | `grok` (`gx`) | - | Grok Build / xAI CLI (https://x.ai/cli) |
@@ -790,6 +791,7 @@ Agent tools (installed to ~/.local/bin and npm globals):
   cyber-mux                           cross-multiplexer pane control (npm global)
   docker-axi                          Docker operations AXI (npm global, GitHub source)
   kubernetes-axi                      Kubernetes operations AXI (npm global, GitHub source)
+  graft                               context graph for agents (npm global)
   ~/git/personal/firstmate/           multi-agent crew distro (git clone)
 ```
 
