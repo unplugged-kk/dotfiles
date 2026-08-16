@@ -19,6 +19,11 @@
       "command": "/Users/kishore/.nvm/versions/node/v24.18.0/bin/node",
       "args": ["/Users/kishore/.claude/plugins/marketplaces/thedotmack/plugin/scripts/mcp-server.cjs"],
       "enabled": true
+    },
+    "graft": {
+      "command": "graft",
+      "args": ["mcp"],
+      "enabled": true
     }
   }
 }
