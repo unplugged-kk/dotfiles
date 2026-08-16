@@ -49,15 +49,6 @@
     }
   },
 
-  // ── Plugins (V2: plugins) ─────────────────────────────────────────────────
-  // ponytail: lazy senior dev mode - YAGNI, minimal code, no over-engineering.
-  // NOTE: this is a V1-format plugin. opencode2 needs it ported to the V2
-  // plugin API (https://opencode.ai/v2/docs/migrate-v1#plugins) before its
-  // hooks fire; the entry below keeps the reference until then.
-  "plugins": [
-    "/Users/kishore/.local/lib/node_modules/@dietrichgebert/ponytail/.opencode/plugins/ponytail.mjs"
-  ],
-
   // ── Permissions (V2: ordered rules array, last match wins) ────────────────
   // OpenCode allows almost everything by default. We only restrict destructive
   // bash. Broad allows first, specific exceptions last.

@@ -1,12 +1,13 @@
 {
   "mcp": {
-    "graft": {
-      "type": "local",
-      "command": [
-        "graft",
-        "mcp"
-      ],
-      "enabled": true
+    "servers": {
+      "graft": {
+        "type": "local",
+        "command": [
+          "graft",
+          "mcp"
+        ]
+      }
     }
   }
 }

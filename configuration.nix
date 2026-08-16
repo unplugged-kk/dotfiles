@@ -17,7 +17,7 @@
   # ── PATH: make nix tools and user profile bins always findable ────────────
   # /opt/homebrew/bin holds brew/cask binaries (gh, copilot, etc.). ~/.local/bin
   # holds user-installed binaries (claude, headroom, code-review-graph,
-  # codegraph, kimchi, opencode symlink). ~/.opencode/bin holds the opencode binary.
+  # codegraph, kimchi, opencode2 via npm global).
   # ~/.nvm/current/bin holds node + npm + npx + commandcode - `current` is
   # maintained by bootstrap.sh's `nvm use --lts`.
   # home.sessionPath in home.nix sets these too, but environment.systemPath overrides
@@ -29,7 +29,6 @@
     "${homeDir}/.nix-profile/bin"
     "${homeDir}/.local/bin"
     "${homeDir}/go/bin"
-    "${homeDir}/.opencode/bin"
     "${homeDir}/.nvm/current/bin"
   ];
 

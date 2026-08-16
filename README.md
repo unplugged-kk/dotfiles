@@ -82,7 +82,7 @@ WezTerm, Ghostty, Warp, Cursor, VS Code, Claude Code, GitHub Copilot CLI, Lens, 
 
 | Agent CLI | Config file | Format |
 |-----------|-------------|--------|
-| OpenCode (`oc` / `oc2`) | `home/.config/opencode/opencode.jsonc` | V2: `{ "mcp": { "servers": { "name": { "type": "local"\|"remote", ... } } }, "permissions": [...] }` |
+| OpenCode 2 (`oc2`) | `home/.config/opencode/opencode.jsonc` | V2: `{ "mcp": { "servers": { "name": { "type": "local"\|"remote", ... } } }, "permissions": [...] }` |
 | Claude Code (`cc`) | `home/.claude/settings.json` | `{ "mcpServers": { "name": { "command"\|"type", ... } } }` |
 | Kimchi | `home/.config/kimchi/harness/mcp.json` | `{ "mcpServers": { "name": { "command", "args", "env" } } }` |
 | Command Code (`cmd`) | `home/.commandcode/mcp.json` | `{ "mcpServers": { "name": { "command"\|"url", ... } } }` |
@@ -199,7 +199,7 @@ Canonical hub: `~/.agents/skills/`. `scripts/sync-skills.sh` shallow-clones the
 upstream skill repos into `~/.agents/skill-repos/`, syncs every `SKILL.md` into
 the hub, and **symlinks every skill** into:
 
-`~/.claude/skills`, `~/.codex/skills`, `~/.cursor/skills`, `~/.grok/skills`, `~/.pi/agent/skills`, `~/.config/opencode/skills`, `~/.opencode/skills`, `~/.commandcode/skills`, `~/.gemini/skills`, `~/.copilot/skills`, `~/.hermes/skills`, `~/.kiro/skills`, `~/.windsurf/skills`, `~/.adal/skills`
+`~/.claude/skills`, `~/.codex/skills`, `~/.cursor/skills`, `~/.grok/skills`, `~/.pi/agent/skills`, `~/.config/opencode/skills`, `~/.commandcode/skills`, `~/.gemini/skills`, `~/.copilot/skills`, `~/.hermes/skills`, `~/.kiro/skills`, `~/.windsurf/skills`, `~/.adal/skills`
 
 `sync-skills.sh` runs during bootstrap (step 14) and `rebuild --upgrade` (step 7).
 Some packs are still added through the [Agent Skills](https://agentskills.io) CLI
@@ -715,8 +715,7 @@ nvim
 | `tf` / `tfp` / `tfa` / `tfd` / `tfi` | terraform commands | infra |
 | `cc` | `claude --dangerously-skip-permissions` | agents |
 | `co` | `codex --full-auto` | agents |
-| `oc` | `opencode` | agents |
-| `oc2` | `opencode2` (V2 beta) | agents |
+| `oc2` | `opencode2` (V2) | agents |
 | `ca` | `cursor-agent` | agents |
 | `pi` | Pi coding agent (npm global, no alias) | agents |
 | `gx` | `grok` (xAI / Grok Build CLI) | agents |

@@ -12,7 +12,7 @@
 #   ~/.cursor/skills-cursor/    per-skill symlinks (Cursor CLI bundled dir)
 #   ~/.grok/skills              per-skill symlinks
 #   ~/.gemini/skills            per-skill symlinks
-#   ~/.opencode/skills + ~/.config/opencode/skills   per-skill symlinks (v1 + v2)
+#   ~/.config/opencode/skills       per-skill symlinks (opencode2)
 #   ~/.copilot/skills/          per-skill symlinks
 #   ~/.commandcode/skills/      per-skill symlinks
 #   ~/.kiro/skills              per-skill symlinks
@@ -43,7 +43,6 @@ REPO_CACHE="$HOME_DIR/.agents/skill-repos"
 CLAUDE_SKILLS="$HOME_DIR/.claude/skills"
 PI_SKILLS="$HOME_DIR/.pi/agent/skills"
 HERMES_SKILLS="$HOME_DIR/.hermes/skills"
-OPENCODE_SKILLS="$HOME_DIR/.opencode/skills"
 OPENCODE_CONFIG_SKILLS="$HOME_DIR/.config/opencode/skills"
 CURSOR_SKILLS="$HOME_DIR/.cursor/skills"
 CURSOR_SKILLS_CURSOR="$HOME_DIR/.cursor/skills-cursor"
@@ -268,7 +267,7 @@ wire_agent_links() {
   # Everything else: per-skill symlinks so each dir may keep its own skills too.
   local dir
   for dir in "$CODEX_SKILLS" "$CURSOR_SKILLS" "$CURSOR_SKILLS_CURSOR" \
-             "$GROK_SKILLS" "$GEMINI_SKILLS" "$OPENCODE_SKILLS" \
+             "$GROK_SKILLS" "$GEMINI_SKILLS" \
              "$OPENCODE_CONFIG_SKILLS" "$COPILOT_SKILLS" \
              "$COMMANDCODE_SKILLS" "$KIRO_SKILLS" "$WINDSURF_SKILLS" \
              "$ADAL_SKILLS"; do

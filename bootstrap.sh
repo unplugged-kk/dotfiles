@@ -343,28 +343,10 @@ else
   echo "    command-code $(command-code --version 2>&1 | head -1) installed"
 fi
 
-# OpenCode (https://opencode.ai/) - terminal coding agent. Official installer
-# puts the binary in ~/.opencode/bin/opencode. We also symlink it into
-# ~/.local/bin so it stays on PATH even when ~/.opencode/bin is missing from
-# a shell's PATH (path_helper / non-login sessions). Config is symlinked from
-# home/.config/opencode/ via home.nix. Shell alias: oc.
-if [ -x "$HOME/.opencode/bin/opencode" ]; then
-  echo "    opencode already installed: $("$HOME/.opencode/bin/opencode" --version 2>&1 | head -1)"
-else
-  curl -fsSL https://opencode.ai/install | bash
-  echo "    opencode installed: $("$HOME/.opencode/bin/opencode" --version 2>&1 | head -1)"
-fi
-mkdir -p "$HOME/.local/bin"
-if [ -x "$HOME/.opencode/bin/opencode" ]; then
-  ln -sfn "$HOME/.opencode/bin/opencode" "$HOME/.local/bin/opencode"
-  echo "    opencode symlink: $HOME/.local/bin/opencode -> $HOME/.opencode/bin/opencode"
-fi
-
-# OpenCode 2 (https://opencode.ai/v2/docs/migrate-v1) - the V2 beta, installed
-# from the `next` npm tag as `opencode2` so it coexists with V1's `opencode`.
-# Both read the same ~/.config/opencode/ config (symlinked via home.nix). npm
-# prefix is ~/.local, so the binary lands in ~/.local/bin/opencode2. Shell
-# alias: oc2.
+# OpenCode 2 (https://opencode.ai/v2/docs) - the only OpenCode we run.
+# Installed from the `next` npm tag as `opencode2`. npm prefix is ~/.local,
+# so the binary lands in ~/.local/bin/opencode2 (on PATH via sessionPath).
+# Shell alias: oc2. Config is symlinked from home/.config/opencode/ via home.nix.
 if command -v opencode2 >/dev/null 2>&1; then
   echo "    opencode2 already installed: $(opencode2 --version 2>&1 | head -1)"
 else
@@ -569,7 +551,7 @@ echo "      code-review-graph $("$HOME/.local/bin/code-review-graph" --version 2
 echo "      cursor-agent      $("$HOME/.local/bin/cursor-agent" --version 2>&1 | head -1)"
 echo "      pi                $(pi --version 2>&1 | head -1)"
 echo "      grok              $(grok --version 2>&1 | head -1)"
-echo "      opencode          $("$HOME/.local/bin/opencode" --version 2>&1 | head -1)"
+echo "      opencode2         $(opencode2 --version 2>&1 | head -1)"
 echo "      firstmate         $FIRSTMATE_DIR"
 echo ""
 echo "    MCP servers (available in all agents):"

@@ -82,9 +82,9 @@ in
 
   # ── PATH additions ────────────────────────────────────────────────────────
   # Mac: /opt/homebrew/bin holds brew/cask binaries. ~/.local/bin holds
-  # user-installed binaries (no-mistakes, treehouse, etc.). ~/.opencode/bin
-  # holds the opencode CLI. ~/.nvm/current/bin holds node + npm + npx + global
-  # npm packages - `current` is maintained by bootstrap.sh's `nvm use --lts`,
+  # user-installed binaries (no-mistakes, treehouse, etc.). ~/.nvm/current/bin
+  # holds node + npm + npx + global npm packages (incl. the opencode2 CLI) -
+  # `current` is maintained by bootstrap.sh's `nvm use --lts`,
   # so an LTS upgrade doesn't require editing this path.
   # Mirrored in configuration.nix:24 environment.systemPath for non-interactive
   # shells on macOS.
@@ -95,12 +95,10 @@ in
     if isLinux then [
       "$HOME/.nix-profile/bin"
       "$HOME/.local/bin"
-      "$HOME/.opencode/bin"
       "$HOME/.nvm/current/bin"
     ] else [
       "/opt/homebrew/bin"
       "$HOME/.local/bin"
-      "$HOME/.opencode/bin"
       "$HOME/.nvm/current/bin"
     ];
 
@@ -179,10 +177,7 @@ in
       # agent shortcuts - high-agency, know what these do before using
       cc = "claude --dangerously-skip-permissions";
       cmd = "command-code";
-      # Absolute paths so aliases work even when PATH is incomplete or aliases
-      # are skipped. Bootstrap also installs shims under ~/.local/bin (ca, gx, oc).
-      oc = "${homeDir}/.opencode/bin/opencode";
-      # OpenCode 2 beta (npm-global in ~/.local/bin, on sessionPath)
+      # OpenCode 2 (npm-global in ~/.local/bin, on sessionPath)
       oc2 = "opencode2";
       # Cursor CLI - prefer cursor-agent over `agent` (Grok owns that name)
       ca = "${homeDir}/.local/bin/cursor-agent";
