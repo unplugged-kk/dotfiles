@@ -411,6 +411,19 @@ elif [ -x "$HOME/.grok/bin/grok" ]; then
   echo "    grok shim: $HOME/.local/bin/gx -> grok"
 fi
 
+# DeepSeek Harness (https://github.com/deepseek-ai/deepseek-harness) - DeepSeek's
+# open-source agent harness ("everything is a plugin", powered by Cordis).
+# Developer preview: expect compatibility-breaking changes. The npm global
+# provides the `dsh` launcher (`dsh web` UI, `dsh --profile headless "task"`
+# one-shots). State lives in ~/.dsh (machine-local, not managed by this repo);
+# upgrades flow through scripts/update-tools.sh. Needs Node 22.19+.
+if command -v dsh >/dev/null 2>&1; then
+  echo "    dsh already installed: $(dsh --version 2>&1 | head -1)"
+else
+  npm install -g @deepseek-ai/dsh@latest
+  echo "    dsh $(dsh --version 2>&1 | head -1) installed"
+fi
+
 echo "==> Step 12: headroom (token compression layer - 20-95% fewer tokens)"
 if "$HOME/.local/bin/headroom" --version >/dev/null 2>&1; then
   echo "    headroom already installed, skipping"
@@ -552,6 +565,7 @@ echo "      cursor-agent      $("$HOME/.local/bin/cursor-agent" --version 2>&1 |
 echo "      pi                $(pi --version 2>&1 | head -1)"
 echo "      grok              $(grok --version 2>&1 | head -1)"
 echo "      opencode2         $(opencode2 --version 2>&1 | head -1)"
+echo "      dsh               $(dsh --version 2>&1 | head -1)"
 echo "      firstmate         $FIRSTMATE_DIR"
 echo ""
 echo "    MCP servers (available in all agents):"

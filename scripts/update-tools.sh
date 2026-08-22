@@ -14,7 +14,7 @@
 #   npm globals             : gh-axi, gnhf, command-code, lavish-axi,
 #                             tasks-axi, chrome-devtools-axi, sqlite-axi,
 #                             gws-axi, gitsheets-axi, pg-axi, cyber-mux,
-#                             graft, ponytail, pi, agnix, cc-safety-net
+#                             graft, ponytail, pi, agnix, cc-safety-net, dsh
 #   npm (github)            : docker-axi, kubernetes-axi
 #   curl installer          : grok
 #   herdr plugins           : browser, reviewr, memex, plus, vim-navigation
@@ -152,13 +152,16 @@ if command -v npm >/dev/null 2>&1; then
     "graft"
     "@dietrichgebert/ponytail"
     "@earendil-works/pi-coding-agent"
+    "@deepseek-ai/dsh"
     "agnix"
     "cc-safety-net"
   )
   to_install=()
   for pkg in "${npm_pkgs[@]}"; do
     if npm list -g --depth=0 "$pkg" >/dev/null 2>&1; then
-      installed="$(npm list -g --depth=0 "$pkg" 2>/dev/null | grep "${pkg}@" | sed -E 's/.*@([0-9]+\.[0-9]+\.[0-9]+).*/\1/' | head -1)"
+      # Prerelease suffixes (-rc.2) must survive extraction or the compare
+      # below always mismatches and forces a pointless reinstall.
+      installed="$(npm list -g --depth=0 "$pkg" 2>/dev/null | grep "${pkg}@" | sed -E 's/.*@([0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?).*/\1/' | head -1)"
       latest="$(npm view "$pkg" version 2>/dev/null)"
       if [ -n "$installed" ] && [ "$installed" = "$latest" ]; then
         echo "    $pkg already at $latest - skipping"

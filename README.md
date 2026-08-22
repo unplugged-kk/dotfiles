@@ -68,6 +68,7 @@ WezTerm, Ghostty, Warp, Cursor, VS Code, Claude Code, GitHub Copilot CLI, Lens, 
 | `cursor-agent` (`ca`) | - | Cursor CLI agent (https://cursor.com/cli) |
 | `pi` | - | Minimal coding agent harness (https://pi.dev/) |
 | `grok` (`gx`) | - | Grok Build / xAI CLI (https://x.ai/cli) |
+| `dsh` (@deepseek-ai/dsh) | - | DeepSeek Harness agent launcher - Web UI + headless one-shots (https://github.com/deepseek-ai/deepseek-harness) |
 
 ### MCP servers (available in all agents)
 | Server | Transport | Purpose |
@@ -177,6 +178,26 @@ gx
 ```
 
 Upgrade later with `grok update`. Auth stays in `~/.grok/auth.json` (not in git).
+
+#### DeepSeek Harness setup (one-time)
+
+DeepSeek Harness (`dsh`, https://github.com/deepseek-ai/deepseek-harness) is DeepSeek's open-source agent harness - "everything is a plugin", powered by Cordis. Currently in developer preview, so expect compatibility-breaking changes. Bootstrap installs it as the npm global `@deepseek-ai/dsh`; `rebuild --upgrade` keeps it current via `scripts/update-tools.sh`.
+
+Declarative config from this repo: none - all state is machine-local under `~/.dsh/` (profiles, `cordis.patch.yml` layers, `.env`, credentials), which stays out of the repo like other agent auth.
+
+```bash
+# Launch the Web UI (serves http://127.0.0.1:3080, opens browser; --no-open to skip)
+dsh web
+
+# One-shot headless task - print answer, exit (needs DEEPSEEK_API_KEY)
+dsh --profile headless "summarize this repo"
+
+# Manage plugins for a profile (forwards to pnpm in ~/.dsh/profiles/<name>)
+dsh plugin --profile <name> add <package>
+
+# Auth: set the key once, or add it in the Web UI (Settings -> Models)
+export DEEPSEEK_API_KEY=sk-...
+```
 
 #### GitHub Copilot CLI setup (one-time)
 
@@ -787,6 +808,7 @@ Agent tools (installed to ~/.local/bin and npm globals):
   ~/.local/bin/cursor-agent           Cursor CLI (shell alias: ca)
   pi                                  Pi coding agent (npm global)
   ~/.local/bin/grok                   Grok Build / xAI CLI (shell alias: gx)
+  dsh                                 DeepSeek Harness launcher (npm global @deepseek-ai/dsh)
   gh-axi                              GitHub CLI for agents (npm global)
   gnhf                                overnight agent runner (npm global)
   lavish-axi                          Lavish Editor: HTML artifact review (npm global)
